@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriTrack — Download Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--navy:#0A0F1E;--card:#161D2E;--card2:#1C2438;--teal:#00D4AA;--teal2:#00B492;--amber:#F5A623;--purple:#7C3AED;--red:#FF4D6D;--blue:#4F8EF7;--green:#22C55E;--white:#F0F4FF;--slate:#8892A4;--border:rgba(255,255,255,0.07);--glass:rgba(255,255,255,0.04);--sidebar:240px}
+  body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  .sidebar{width:var(--sidebar);min-height:100vh;background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100}
+  .sidebar-brand{padding:28px 24px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .logo-ring{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--teal);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:14px;color:var(--teal)}
+  .brand-name{font-family:'Sora',sans-serif;font-weight:700;font-size:18px}
+  .brand-name em{color:var(--teal);font-style:normal}
+  .nav-section{padding:16px 12px 8px}
+  .nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--slate);padding:0 12px 8px;font-weight:600}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;text-decoration:none;color:var(--slate);font-size:13.5px;font-weight:500;transition:all 0.18s;cursor:pointer;margin-bottom:3px}
+  .nav-item:hover{background:var(--glass);color:var(--white)}
+  .nav-item.active{background:rgba(0,212,170,0.12);color:var(--teal)}
+  .nav-item .icon{width:18px;height:18px;flex-shrink:0}
+  .nav-badge{margin-left:auto;background:var(--teal);color:var(--navy);font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .sidebar-bottom{margin-top:auto;padding:16px 12px;border-top:1px solid var(--border)}
+  .user-card{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:var(--glass);cursor:pointer}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;color:white;flex-shrink:0}
+  .user-info .name{font-size:13px;font-weight:600}
+  .user-info .role{font-size:11px;color:var(--slate)}
+  .logout-btn{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--slate)}
+
+  .main{margin-left:var(--sidebar);flex:1}
+  .topbar{padding:22px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--card);position:sticky;top:0;z-index:50}
+  .topbar h1{font-family:'Sora',sans-serif;font-weight:700;font-size:20px;letter-spacing:-0.3px}
+  .topbar p{font-size:13px;color:var(--slate);margin-top:2px}
+
+  .content{padding:32px;max-width:1000px}
+
+  /* Hero banner */
+  .export-hero{background:linear-gradient(130deg,#0D1627,#112240);border:1px solid var(--border);border-radius:20px;padding:36px 40px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;overflow:hidden}
+  .export-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,212,170,0.12),transparent 70%);pointer-events:none}
+  .hero-text h2{font-family:'Sora',sans-serif;font-weight:800;font-size:28px;letter-spacing:-0.5px;margin-bottom:8px}
+  .hero-text h2 span{color:var(--teal)}
+  .hero-text p{font-size:14px;color:var(--slate);line-height:1.7;max-width:420px}
+  .hero-stats{display:flex;gap:20px;flex-shrink:0}
+  .hs-pill{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:14px;padding:16px 20px;text-align:center}
+  .hs-pill .val{font-family:'Sora',sans-serif;font-weight:800;font-size:26px;color:var(--teal)}
+  .hs-pill .lbl{font-size:11px;color:var(--slate);margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+
+  /* Range selector */
+  .range-section{margin-bottom:24px}
+  .section-title{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;margin-bottom:14px}
+  .range-tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .range-tab{padding:9px 20px;border:1px solid var(--border);border-radius:9px;background:transparent;color:var(--slate);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:'Inter',sans-serif}
+  .range-tab:hover{border-color:rgba(255,255,255,0.2);color:var(--white)}
+  .range-tab.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
+  .custom-range{display:none;margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .date-input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:var(--white);outline:none;transition:border-color 0.2s}
+  .date-input:focus{border-color:var(--teal)}
+  .date-input::-webkit-calendar-picker-indicator{filter:invert(0.6)}
+
+  /* Export cards */
+  .export-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+  .export-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;transition:all 0.2s;position:relative;overflow:hidden}
+  .export-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s}
+  .export-card.csv::before{background:radial-gradient(ellipse at 0% 0%,rgba(34,197,94,0.07),transparent 60%)}
+  .export-card.json::before{background:radial-gradient(ellipse at 0% 0%,rgba(79,142,247,0.07),transparent 60%)}
+  .export-card.print::before{background:radial-gradient(ellipse at 0% 0%,rgba(245,166,35,0.07),transparent 60%)}
+  .export-card:hover{transform:translateY(-3px);border-color:rgba(255,255,255,0.14)}
+  .export-card:hover::before{opacity:1}
+  .ec-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;z-index:1}
+  .csv .ec-icon{background:rgba(34,197,94,0.12)}
+  .json .ec-icon{background:rgba(79,142,247,0.12)}
+  .print .ec-icon{background:rgba(245,166,35,0.12)}
+  .ec-title{font-family:'Sora',sans-serif;font-weight:700;font-size:15px;position:relative;z-index:1}
+  .ec-desc{font-size:12px;color:var(--slate);line-height:1.6;position:relative;z-index:1}
+  .ec-features{list-style:none;display:flex;flex-direction:column;gap:5px;position:relative;z-index:1}
+  .ec-features li{font-size:12px;color:var(--slate);display:flex;align-items:center;gap:6px}
+  .ec-features li::before{content:'✓';color:var(--teal);font-weight:700}
+  .ec-btn{margin-top:auto;padding:11px;border-radius:10px;border:none;font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s;position:relative;z-index:1}
+  .csv .ec-btn{background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.25)}
+  .csv .ec-btn:hover{background:rgba(34,197,94,0.25)}
+  .json .ec-btn{background:rgba(79,142,247,0.15);color:var(--blue);border:1px solid rgba(79,142,247,0.25)}
+  .json .ec-btn:hover{background:rgba(79,142,247,0.25)}
+  .print .ec-btn{background:rgba(245,166,35,0.15);color:var(--amber);border:1px solid rgba(245,166,35,0.25)}
+  .print .ec-btn:hover{background:rgba(245,166,35,0.25)}
+
+  /* Data Preview */
+  .preview-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+  .preview-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:gap}
+  .preview-tabs{display:flex;gap:6px}
+  .preview-tab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--slate);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.18s;font-family:'Inter',sans-serif}
+  .preview-tab.active{background:rgba(0,212,170,0.12);color:var(--teal);border-color:rgba(0,212,170,0.25)}
+  .data-table-wrap{overflow-x:auto}
+  .data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:700px}
+  .data-table th{text-align:left;padding:10px 14px;background:rgba(255,255,255,0.04);color:var(--slate);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+  .data-table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--white)}
+  .data-table tr:last-child td{border-bottom:none}
+  .data-table tr:hover td{background:rgba(255,255,255,0.02)}
+  .td-date{color:var(--slate);font-size:12px}
+  .td-num{font-family:'Sora',sans-serif;font-weight:600}
+  .td-pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+
+  /* Summary stats */
+  .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+  .sum-card .sc-label{font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px}
+  .sum-card .sc-val{font-family:'Sora',sans-serif;font-weight:800;font-size:22px}
+  .sum-card .sc-sub{font-size:11px;color:var(--slate);margin-top:4px}
+
+  /* Trend bars */
+  .trend-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:24px}
+  .trend-chart{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:16px}
+  .trend-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .trend-bar{width:100%;border-radius:4px 4px 0 0;transition:height 0.6s cubic-bezier(0.4,0,0.2,1);min-height:4px}
+  .trend-day{font-size:9px;color:var(--slate);text-align:center}
+  .trend-val{font-size:9px;color:var(--slate)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:28px;right:28px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 16px 40px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s cubic-bezier(0.4,0,0.2,1);z-index:999;pointer-events:none}
+  .toast.show{transform:translateY(0);opacity:1}
+  .toast-icon{font-size:18px}
+
+  .empty-state{text-align:center;padding:40px;color:var(--slate)}
+  .empty-state .es-icon{font-size:48px;margin-bottom:12px}
+  .empty-state .es-title{font-size:15px;font-weight:600;color:var(--white);margin-bottom:6px}
+  .empty-state .es-sub{font-size:13px}
+
+  @media(max-width:900px){.export-grid{grid-template-columns:1fr 1fr}.sidebar{transform:translateX(-100%)}.main{margin-left:0}.hero-stats{display:none}.summary-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:600px){.export-grid{grid-template-columns:1fr}.summary-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand"><div class="logo-ring">N</div><div class="brand-name"><em>Nutri</em>Track</div></div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item"><svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+    <a href="food-log.html" class="nav-item"><svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>Food Log<span class="nav-badge">Today</span></a>
+    <a href="macro-calculator.html" class="nav-item"><svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Macro Calc</a>
+    <a href="bmi-calculator.html" class="nav-item"><svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>BMI Calculator</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Reports</div>
+    <a href="download-report.html" class="nav-item active"><svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Download Data</a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar" id="user-avatar">A</div>
+      <div class="user-info"><div class="name" id="user-name">User</div><div class="role">Free Plan</div></div>
+      <button class="logout-btn" onclick="logout()"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div><h1>📥 Download Report</h1><p>Export your nutrition & body data</p></div>
+  </div>
+
+  <div class="content">
+    <!-- HERO -->
+    <div class="export-hero">
+      <div class="hero-text">
+        <h2>Your data, <span>your way</span></h2>
+        <p>Export your complete nutrition history including daily macros, micronutrients, weight logs, and BMI records. Choose your format and date range below.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="hs-pill"><div class="val" id="stat-days">0</div><div class="lbl">Days Logged</div></div>
+        <div class="hs-pill"><div class="val" id="stat-meals">0</div><div class="lbl">Total Meals</div></div>
+        <div class="hs-pill"><div class="val" id="stat-entries">0</div><div class="lbl">Food Entries</div></div>
+      </div>
+    </div>
+
+    <!-- DATE RANGE -->
+    <div class="range-section">
+      <div class="section-title">Date Range</div>
+      <div class="range-tabs">
+        <button class="range-tab" onclick="setRange(7,this)">Last 7 Days</button>
+        <button class="range-tab active" onclick="setRange(30,this)">Last 30 Days</button>
+        <button class="range-tab" onclick="setRange(60,this)">Last 60 Days</button>
+        <button class="range-tab" onclick="setRange(90,this)">Last 90 Days</button>
+        <button class="range-tab" onclick="setRange('all',this)">All Time</button>
+        <button class="range-tab" onclick="setRange('custom',this)">Custom</button>
+      </div>
+      <div class="custom-range" id="custom-range" style="display:none">
+        <label style="font-size:12px;color:var(--slate);font-weight:600">From</label>
+        <input type="date" class="date-input" id="date-from">
+        <label style="font-size:12px;color:var(--slate);font-weight:600">To</label>
+        <input type="date" class="date-input" id="date-to">
+        <button onclick="applyCustomRange()" style="background:var(--teal);color:var(--navy);border:none;border-radius:8px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;font-family:'Inter',sans-serif">Apply</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY STATS -->
+    <div class="summary-grid">
+      <div class="sum-card">
+        <div class="sc-label">Avg Daily Calories</div>
+        <div class="sc-val" id="avg-cal" style="color:var(--teal)">—</div>
+        <div class="sc-sub">kcal per day</div>
+      </div>
+      <div class="sum-card">
+        <div class="sc-label">Avg Protein</div>
+        <div class="sc-val" id="avg-pro" style="color:var(--teal)">—</div>
+        <div class="sc-sub">grams per day</div>
+      </div>
+      <div class="sum-card">
+        <div class="sc-label">Weight Change</div>
+        <div class="sc-val" id="weight-change" style="color:var(--amber)">—</div>
+        <div class="sc-sub">over period</div>
+      </div>
+      <div class="sum-card">
+        <div class="sc-label">Best Streak</div>
+        <div class="sc-val" id="best-streak" style="color:var(--purple)">—</div>
+        <div class="sc-sub">consecutive days</div>
+      </div>
+    </div>
+
+    <!-- TREND CHART -->
+    <div class="trend-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="section-title" style="margin-bottom:0">Calorie Trend</div>
+        <div style="font-size:12px;color:var(--slate)">Last 30 days</div>
+      </div>
+      <div class="trend-chart" id="trend-chart"></div>
+    </div>
+
+    <!-- EXPORT OPTIONS -->
+    <div class="section-title" style="margin-bottom:14px">Export Format</div>
+    <div class="export-grid">
+      <!-- CSV -->
+      <div class="export-card csv">
+        <div class="ec-icon">📊</div>
+        <div class="ec-title">CSV Spreadsheet</div>
+        <div class="ec-desc">Opens in Excel, Google Sheets, Numbers — perfect for your own analysis.</div>
+        <ul class="ec-features">
+          <li>Daily nutrition totals</li>
+          <li>Per-meal food entries</li>
+          <li>Weight & BMI history</li>
+          <li>Micronutrient breakdown</li>
+        </ul>
+        <button class="ec-btn" onclick="exportCSV()">⬇ Download CSV</button>
+      </div>
+
+      <!-- JSON -->
+      <div class="export-card json">
+        <div class="ec-icon">🗂</div>
+        <div class="ec-title">JSON Data</div>
+        <div class="ec-desc">Raw structured data for developers — import into any app or database.</div>
+        <ul class="ec-features">
+          <li>Complete raw data</li>
+          <li>All fields preserved</li>
+          <li>Nested meal structure</li>
+          <li>Easy to re-import</li>
+        </ul>
+        <button class="ec-btn" onclick="exportJSON()">⬇ Download JSON</button>
+      </div>
+
+      <!-- Print / HTML Report -->
+      <div class="export-card print">
+        <div class="ec-icon">🖨</div>
+        <div class="ec-title">Printable Report</div>
+        <div class="ec-desc">A formatted HTML report you can print or save as PDF from your browser.</div>
+        <ul class="ec-features">
+          <li>Styled summary page</li>
+          <li>Macro charts included</li>
+          <li>Share with a dietitian</li>
+          <li>Save as PDF via browser</li>
+        </ul>
+        <button class="ec-btn" onclick="exportPrintReport()">🖨 Open Report</button>
+      </div>
+    </div>
+
+    <!-- DATA PREVIEW -->
+    <div class="preview-panel">
+      <div class="preview-header">
+        <div class="section-title" style="margin-bottom:0">Data Preview</div>
+        <div class="preview-tabs">
+          <button class="preview-tab active" onclick="showPreview('daily',this)">Daily Summary</button>
+          <button class="preview-tab" onclick="showPreview('meals',this)">Food Entries</button>
+          <button class="preview-tab" onclick="showPreview('weight',this)">Weight Log</button>
+          <button class="preview-tab" onclick="showPreview('bmi',this)">BMI History</button>
+        </div>
+      </div>
+      <div class="data-table-wrap">
+        <div id="preview-content"></div>
+      </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div style="background:rgba(255,77,109,0.04);border:1px solid rgba(255,77,109,0.15);border-radius:16px;padding:24px">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px;color:var(--red)">⚠ Danger Zone</div>
+      <div style="font-size:13px;color:var(--slate);margin-bottom:16px;line-height:1.7">Permanently delete all your stored data. This cannot be undone. We recommend downloading your data first.</div>
+      <button onclick="clearAllData()" style="background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.25);border-radius:9px;padding:11px 22px;color:var(--red);font-family:'Sora',sans-serif;font-weight:700;font-size:13px;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(255,77,109,0.2)'" onmouseout="this.style.background='rgba(255,77,109,0.1)'">🗑 Clear All Data</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon">✅</span>
+  <span id="toast-msg">Done!</span>
+</div>
+
+<script type="module">
+  import { requireAuth, logoutUser } from "./auth.js";
+
+  const BASE = "http://localhost:3001";
+
+  window.logout = logoutUser;
+
+  let token        = null;
+  let rangeDays    = 30;
+  let currentPreview = "daily";
+  let logData      = {};
+  let weightsData  = [];
+  let streakData   = { count: 0 };
+  let prefsData    = { calories: 2000, protein: 150, carbs: 250, fat: 65 };
+  let profileData  = {};
+
+  requireAuth(async (t, user) => {
+    token = t;
+    const name = user.email.split("@")[0];
+    document.getElementById("user-avatar").textContent = name[0].toUpperCase();
+    document.getElementById("user-name").textContent   = name;
+    const todayStr = new Date().toISOString().split("T")[0];
+    const fromStr  = new Date(Date.now()-30*864e5).toISOString().split("T")[0];
+    document.getElementById("date-to").value   = todayStr;
+    document.getElementById("date-from").value = fromStr;
+    await loadAll();
+  });
+
+  async function api(path) {
+    const res = await fetch(`${BASE}${path}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return res.json();
+  }
+
+  async function loadAll() {
+    try {
+      const today  = new Date().toISOString().split("T")[0];
+      const from90 = new Date(Date.now()-90*864e5).toISOString().split("T")[0];
+      [profileData, prefsData, weightsData, streakData, logData] = await Promise.all([
+        api("/api/profile"),
+        api("/api/prefs"),
+        api("/api/weights?count=90"),
+        api("/api/streak"),
+        api(`/api/log?from=${from90}&to=${today}`),
+      ]);
+      const fname = profileData?.fname || "";
+      const lname = profileData?.lname || "";
+      document.getElementById("user-avatar").textContent =
+        ((fname[0]||"")+(lname[0]||"")).toUpperCase() || "U";
+      document.getElementById("user-name").textContent =
+        `${fname} ${lname}`.trim() || "User";
+      refresh();
+    } catch (e) { console.error("Load error:", e); }
+  }
+
+  function getDateRange() {
+    const to = new Date(); to.setHours(23,59,59,999);
+    let from = new Date();
+    if (rangeDays === "all") {
+      from = new Date("2020-01-01");
+    } else if (rangeDays === "custom") {
+      from = new Date(document.getElementById("date-from").value || "2020-01-01");
+    } else {
+      from.setDate(from.getDate() - (rangeDays - 1));
+    }
+    from.setHours(0,0,0,0);
+    return { from, to };
+  }
+
+  function getFilteredLog() {
+    const { from, to } = getDateRange();
+    const result = {};
+    Object.keys(logData).sort().forEach(key => {
+      const d = new Date(key);
+      if (d >= from && d <= to) result[key] = logData[key];
+    });
+    return result;
+  }
+
+  function getDailyTotals(log) {
+    return Object.entries(log).map(([date, data]) => {
+      const meals = data.meals || [];
+      const tot = meals.reduce((s,m) => ({
+        calories: s.calories+(m.calories||0),
+        protein:  s.protein +(m.protein ||0),
+        carbs:    s.carbs   +(m.carbs   ||0),
+        fat:      s.fat     +(m.fat     ||0),
+        fiber:    s.fiber   +(m.fiber   ||0),
+        sugar:    s.sugar   +(m.sugar   ||0),
+        sodium:   s.sodium  +(m.sodium  ||0),
+        vitc:     s.vitc    +(m.vitc    ||0),
+        calcium:  s.calcium +(m.calcium ||0),
+        iron:     s.iron    +(m.iron    ||0),
+      }), {calories:0,protein:0,carbs:0,fat:0,fiber:0,sugar:0,sodium:0,vitc:0,calcium:0,iron:0});
+      return { date, water: data.water||0, mealCount: meals.length, ...tot };
+    });
+  }
+
+  window.setRange = (days, btn) => {
+    rangeDays = days;
+    document.querySelectorAll(".range-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("custom-range").style.display = days === "custom" ? "flex" : "none";
+    if (days !== "custom") refresh();
+  };
+
+  window.applyCustomRange = () => { rangeDays = "custom"; refresh(); };
+
+  function refresh() {
+    const log    = getFilteredLog();
+    const totals = getDailyTotals(log);
+    const days   = totals.length;
+    const totalMeals   = totals.reduce((s,d) => s + d.mealCount, 0);
+    const totalEntries = Object.values(log).reduce((s,d) => s + (d.meals||[]).length, 0);
+
+    document.getElementById("stat-days").textContent    = days;
+    document.getElementById("stat-meals").textContent   = totalMeals;
+    document.getElementById("stat-entries").textContent = totalEntries;
+
+    const avgCal = days ? Math.round(totals.reduce((s,d)=>s+d.calories,0)/days) : 0;
+    const avgPro = days ? Math.round(totals.reduce((s,d)=>s+d.protein, 0)/days) : 0;
+    document.getElementById("avg-cal").textContent = avgCal || "—";
+    document.getElementById("avg-pro").textContent = avgPro ? avgPro+"g" : "—";
+
+    const { from, to } = getDateRange();
+    const filteredWeights = (Array.isArray(weightsData) ? weightsData : [])
+      .filter(w => { const d = new Date(w.dateKey||""); return d >= from && d <= to; })
+      .reverse();
+    if (filteredWeights.length >= 2) {
+      const diff = (filteredWeights[filteredWeights.length-1].weight - filteredWeights[0].weight).toFixed(1);
+      const el = document.getElementById("weight-change");
+      el.textContent = (diff >= 0 ? "+" : "") + diff + "kg";
+      el.style.color = diff < 0 ? "var(--green)" : diff > 0 ? "var(--red)" : "var(--slate)";
+    } else {
+      document.getElementById("weight-change").textContent = "—";
+    }
+
+    document.getElementById("best-streak").textContent =
+      streakData?.count ? streakData.count+"d" : "—";
+
+    renderTrend(totals);
+    renderPreview(currentPreview);
+  }
+
+  function renderTrend(totals) {
+    const el = document.getElementById("trend-chart");
+    if (!totals.length) {
+      el.innerHTML = `<div style="color:var(--slate);font-size:13px;padding:20px">No data in range</div>`;
+      return;
+    }
+    const last30  = totals.slice(-30);
+    const maxCal  = Math.max(...last30.map(d => d.calories), 1);
+    const calGoal = prefsData?.calories || 2000;
+    el.innerHTML  = last30.map(d => {
+      const pct   = Math.round((d.calories / maxCal) * 100);
+      const color = d.calories > calGoal ? "var(--amber)" : "var(--teal)";
+      const short = d.date.slice(5);
+      return `<div class="trend-bar-wrap" title="${d.date}: ${Math.round(d.calories)} kcal">
+        <div class="trend-val" style="font-size:8px;color:var(--slate)">${Math.round(d.calories/100)*100||""}</div>
+        <div class="trend-bar" style="height:${Math.max(pct,4)}%;background:${color};opacity:0.85"></div>
+        <div class="trend-day">${short.replace("-","/")} </div>
+      </div>`;
+    }).join("");
+  }
+
+  window.showPreview = (type, btn) => {
+    currentPreview = type;
+    document.querySelectorAll(".preview-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    renderPreview(type);
+  };
+
+  function renderPreview(type) {
+    const el  = document.getElementById("preview-content");
+    const log = getFilteredLog();
+
+    if (type === "daily") {
+      const totals = getDailyTotals(log);
+      if (!totals.length) { el.innerHTML = emptyState("No food logs in this range"); return; }
+      el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Date</th><th>Meals</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Fiber</th><th>Water</th></tr></thead>
+        <tbody>${totals.slice().reverse().map(d => `<tr>
+          <td class="td-date">${d.date}</td>
+          <td>${d.mealCount}</td>
+          <td class="td-num" style="color:var(--teal)">${Math.round(d.calories)}</td>
+          <td class="td-num">${Math.round(d.protein)}g</td>
+          <td class="td-num">${Math.round(d.carbs)}g</td>
+          <td class="td-num">${Math.round(d.fat)}g</td>
+          <td>${Math.round(d.fiber)}g</td>
+          <td>${d.water}ml</td>
+        </tr>`).join("")}</tbody>
+      </table>`;
+    } else if (type === "meals") {
+      const all = [];
+      Object.entries(log).forEach(([date,data]) =>
+        (data.meals||[]).forEach(m => all.push({date,...m}))
+      );
+      if (!all.length) { el.innerHTML = emptyState("No meal entries in this range"); return; }
+      const mealColors = { breakfast:"var(--amber)", lunch:"var(--teal)", dinner:"var(--purple)", snack:"var(--blue)" };
+      el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Date</th><th>Meal</th><th>Food</th><th>Serving</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th></tr></thead>
+        <tbody>${all.slice().reverse().slice(0,100).map(m => `<tr>
+          <td class="td-date">${m.date}</td>
+          <td><span class="td-pill" style="background:${(mealColors[m.type]||"var(--slate)")}22;color:${mealColors[m.type]||"var(--slate)"}">${m.type||"—"}</span></td>
+          <td style="font-weight:500">${m.name}</td>
+          <td>${m.serving||100}g</td>
+          <td class="td-num" style="color:var(--teal)">${Math.round(m.calories||0)}</td>
+          <td>${Math.round(m.protein||0)}g</td>
+          <td>${Math.round(m.carbs||0)}g</td>
+          <td>${Math.round(m.fat||0)}g</td>
+        </tr>`).join("")}</tbody>
+      </table>${all.length>100?`<div style="padding:12px 14px;font-size:12px;color:var(--slate)">Showing 100 of ${all.length} entries.</div>`:""}`;
+    } else if (type === "weight") {
+      if (!weightsData?.length) { el.innerHTML = emptyState("No weight entries yet"); return; }
+      el.innerHTML = `<table class="data-table">
+        <thead><tr><th>Date</th><th>Weight (kg)</th><th>Change</th></tr></thead>
+        <tbody>${weightsData.map((w,i,arr) => {
+          const prev = arr[i+1];
+          const diff = prev ? (w.weight - prev.weight).toFixed(1) : null;
+          const col  = diff===null ? "var(--slate)" : diff<0 ? "var(--green)" : "var(--red)";
+          return `<tr>
+            <td class="td-date">${w.dateKey||""}</td>
+            <td class="td-num">${w.weight} kg</td>
+            <td style="color:${col};font-weight:600">${diff===null?"—":(diff>=0?"+":"")+diff+" kg"}</td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table>`;
+    } else if (type === "bmi") {
+      el.innerHTML = emptyState("BMI history coming soon — check the BMI Calculator page");
+    }
+  }
+
+  function emptyState(msg) {
+    return `<div class="empty-state"><div class="es-icon">📭</div><div class="es-title">No Data</div><div class="es-sub">${msg}</div></div>`;
+  }
+
+  window.exportCSV = () => {
+    const log    = getFilteredLog();
+    const totals = getDailyTotals(log);
+    const allMeals = [];
+    Object.entries(log).forEach(([date,data]) =>
+      (data.meals||[]).forEach(m => allMeals.push({date,...m}))
+    );
+    let csv = "=== DAILY SUMMARY ===\nDate,Meals,Calories,Protein(g),Carbs(g),Fat(g),Fiber(g),Water(ml)\n";
+    totals.forEach(d => {
+      csv += `${d.date},${d.mealCount},${Math.round(d.calories)},${Math.round(d.protein)},${Math.round(d.carbs)},${Math.round(d.fat)},${d.fiber.toFixed(1)},${d.water}\n`;
+    });
+    csv += "\n=== FOOD ENTRIES ===\nDate,Meal Type,Food Name,Serving(g),Calories,Protein(g),Carbs(g),Fat(g)\n";
+    allMeals.forEach(m => {
+      csv += `${m.date},${m.type||""},${JSON.stringify(m.name)},${m.serving||100},${Math.round(m.calories||0)},${Math.round(m.protein||0)},${Math.round(m.carbs||0)},${Math.round(m.fat||0)}\n`;
+    });
+    csv += "\n=== WEIGHT LOG ===\nDate,Weight(kg)\n";
+    weightsData.forEach(w => { csv += `${w.dateKey||""},${w.weight}\n`; });
+    download(`nutritrack_report_${todayStr()}.csv`, csv, "text/csv");
+    showToast("✅", "CSV downloaded!");
+  };
+
+  window.exportJSON = () => {
+    const data = {
+      exportedAt: new Date().toISOString(),
+      profile: profileData, prefs: prefsData,
+      foodLog: getFilteredLog(), weightLog: weightsData, streak: streakData,
+    };
+    download(`nutritrack_data_${todayStr()}.json`, JSON.stringify(data, null, 2), "application/json");
+    showToast("✅", "JSON downloaded!");
+  };
+
+  window.exportPrintReport = () => {
+    const log    = getFilteredLog();
+    const totals = getDailyTotals(log);
+    const { from, to } = getDateRange();
+    const days   = totals.length;
+    const avgCal  = days ? Math.round(totals.reduce((s,d)=>s+d.calories,0)/days) : 0;
+    const avgPro  = days ? Math.round(totals.reduce((s,d)=>s+d.protein, 0)/days) : 0;
+    const avgCarb = days ? Math.round(totals.reduce((s,d)=>s+d.carbs,   0)/days) : 0;
+    const avgFat  = days ? Math.round(totals.reduce((s,d)=>s+d.fat,     0)/days) : 0;
+    const fname   = profileData?.fname || "User";
+    const goals   = prefsData || { calories:2000, protein:150, carbs:250, fat:65 };
+
+    const win = window.open("", "_blank");
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>NutriTrack Report</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f8fafc;color:#1a202c;padding:40px}
+.header{background:linear-gradient(135deg,#0A0F1E,#112240);color:white;border-radius:16px;padding:32px 40px;margin-bottom:28px;display:flex;justify-content:space-between;align-items:flex-start}
+.header h1{font-size:28px;font-weight:800;margin-bottom:6px}
+.header h1 span{color:#00D4AA}
+.header p{font-size:13px;color:#8892A4}
+.meta{text-align:right;font-size:13px;color:#8892A4}
+.meta strong{color:white;display:block;font-size:16px;margin-bottom:4px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat{background:white;border-radius:12px;padding:20px;border:1px solid #e2e8f0;text-align:center}
+.stat .val{font-size:28px;font-weight:800;color:#00D4AA}
+.stat .lbl{font-size:11px;color:#8892A4;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.macro{border-radius:12px;padding:20px;text-align:center}
+.macro.p{background:#e6fdf8;border:1px solid #b2f5ea}
+.macro.c{background:#fffbeb;border:1px solid #fde68a}
+.macro.f{background:#f5f3ff;border:1px solid #ddd6fe}
+.macro .mv{font-size:32px;font-weight:800}
+.macro.p .mv{color:#00B492}.macro.c .mv{color:#D97706}.macro.f .mv{color:#7C3AED}
+.macro .ml{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px}
+th{background:#f8fafc;padding:10px 14px;text-align:left;font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+td{padding:10px 14px;border-bottom:1px solid #f1f5f9;font-size:13px}
+tr:last-child td{border-bottom:none}
+.section-title{font-size:17px;font-weight:700;margin-bottom:12px;color:#1a202c}
+.note{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;font-size:12px;color:#166534;margin-top:24px}
+@media print{body{background:white;padding:20px}.header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style></head><body>
+<div class="header">
+  <div>
+    <div style="font-size:12px;color:#00D4AA;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">NutriTrack Health Report</div>
+    <h1>Nutrition <span>Summary</span></h1>
+    <p>Generated on ${new Date().toLocaleDateString("en-US",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
+  </div>
+  <div class="meta"><strong>${fname}</strong>Period: ${from.toLocaleDateString()} – ${to.toLocaleDateString()}</div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="val">${days}</div><div class="lbl">Days Tracked</div></div>
+  <div class="stat"><div class="val">${avgCal}</div><div class="lbl">Avg Calories/Day</div></div>
+  <div class="stat"><div class="val">${weightsData?.length||0}</div><div class="lbl">Weight Entries</div></div>
+  <div class="stat"><div class="val">${streakData?.count||0}</div><div class="lbl">Day Streak</div></div>
+</div>
+<div class="section-title">Average Daily Macros</div>
+<div class="macros">
+  <div class="macro p"><div class="mv">${avgPro}g</div><div class="ml">Protein (goal: ${goals.protein||150}g)</div></div>
+  <div class="macro c"><div class="mv">${avgCarb}g</div><div class="ml">Carbs (goal: ${goals.carbs||250}g)</div></div>
+  <div class="macro f"><div class="mv">${avgFat}g</div><div class="ml">Fat (goal: ${goals.fat||65}g)</div></div>
+</div>
+<div class="section-title">Daily Log</div>
+<table><thead><tr><th>Date</th><th>Meals</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fat</th><th>Water</th></tr></thead>
+<tbody>${totals.slice(-30).reverse().map(d=>`<tr><td>${d.date}</td><td>${d.mealCount}</td><td>${Math.round(d.calories)} kcal</td><td>${Math.round(d.protein)}g</td><td>${Math.round(d.carbs)}g</td><td>${Math.round(d.fat)}g</td><td>${d.water}ml</td></tr>`).join("")}</tbody></table>
+${weightsData?.length?`<div class="section-title">Weight History</div><table><thead><tr><th>Date</th><th>Weight</th></tr></thead><tbody>${weightsData.slice(0,20).map(w=>`<tr><td>${w.dateKey||""}</td><td>${w.weight} kg</td></tr>`).join("")}</tbody></table>`:""}
+<div class="note">This report was generated by NutriTrack. For medical advice, consult a qualified healthcare professional.</div>
+</body></html>`);
+    win.document.close();
+    setTimeout(() => win.print(), 800);
+    showToast("🖨", "Print report opened!");
+  };
+
+  window.clearAllData = async () => {
+    if (!confirm("Delete ALL your NutriTrack data? This cannot be undone.")) return;
+    if (!confirm("Last chance — delete everything?")) return;
+    try {
+      await fetch(`${BASE}/api/profile`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await logoutUser();
+    } catch (e) { showToast("❌", "Delete failed"); }
+  };
+
+  function download(filename, content, type) {
+    const blob = new Blob([content], { type });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement("a");
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function todayStr() { return new Date().toISOString().split("T")[0]; }
+
+  window.showToast = (icon, msg) => {
+    document.getElementById("toast-icon").textContent = icon;
+    document.getElementById("toast-msg").textContent  = msg;
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3500);
+  };
+</script>
+</body>
+</html>

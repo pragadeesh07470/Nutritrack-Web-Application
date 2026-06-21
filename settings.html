@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriTrack — Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0A0F1E; --navy2: #111827; --card: #161D2E; --card2: #1C2438;
+    --teal: #00D4AA; --teal2: #00B492; --amber: #F5A623; --purple: #7C3AED;
+    --red: #FF4D6D; --blue: #4F8EF7; --white: #F0F4FF; --slate: #8892A4;
+    --border: rgba(255,255,255,0.07); --glass: rgba(255,255,255,0.04);
+    --sidebar: 240px;
+  }
+  body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--white); display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar { width: var(--sidebar); min-height: 100vh; background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 100; transition: transform 0.3s; }
+  .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .logo-ring { width: 38px; height: 38px; border-radius: 50%; border: 2.5px solid var(--teal); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 14px; color: var(--teal); flex-shrink: 0; }
+  .brand-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; }
+  .brand-name em { color: var(--teal); font-style: normal; }
+  .nav-section { padding: 16px 12px 8px; }
+  .nav-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--slate); padding: 0 12px 8px; font-weight: 600; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; text-decoration: none; color: var(--slate); font-size: 13.5px; font-weight: 500; transition: all 0.18s; cursor: pointer; margin-bottom: 3px; }
+  .nav-item:hover { background: var(--glass); color: var(--white); }
+  .nav-item.active { background: rgba(0,212,170,0.12); color: var(--teal); }
+  .nav-item .icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--teal); color: var(--navy); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+  .sidebar-bottom { margin-top: auto; padding: 16px 12px; border-top: 1px solid var(--border); }
+  .user-card { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 10px; background: var(--glass); cursor: pointer; transition: background 0.18s; }
+  .user-card:hover { background: rgba(255,255,255,0.07); }
+  .avatar-sm { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--purple)); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 13px; color: white; flex-shrink: 0; }
+  .user-info .name { font-size: 13px; font-weight: 600; color: var(--white); }
+  .user-info .role { font-size: 11px; color: var(--slate); }
+  .logout-btn { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--slate); transition: color 0.18s; }
+  .logout-btn:hover { color: var(--red); }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar); flex: 1; }
+  .topbar { padding: 22px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--card); position: sticky; top: 0; z-index: 50; }
+  .topbar-left h1 { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.3px; }
+  .topbar-left p { font-size: 13px; color: var(--slate); margin-top: 2px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13.5px; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; }
+  .btn-teal { background: var(--teal); color: var(--navy); }
+  .btn-teal:hover { background: var(--teal2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,170,0.3); }
+  .btn-ghost { background: var(--glass); border: 1px solid var(--border); color: var(--white); }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+  .btn-danger { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.25); color: var(--red); }
+  .btn-danger:hover { background: rgba(255,77,109,0.2); }
+
+  /* SETTINGS LAYOUT */
+  .settings-wrap { display: flex; gap: 0; min-height: calc(100vh - 74px); }
+  .settings-nav { width: 220px; padding: 24px 0; flex-shrink: 0; border-right: 1px solid var(--border); }
+  .settings-nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; font-size: 13.5px; font-weight: 500; color: var(--slate); cursor: pointer; transition: all 0.18s; border-right: 2px solid transparent; }
+  .settings-nav-item:hover { color: var(--white); background: var(--glass); }
+  .settings-nav-item.active { color: var(--teal); border-right-color: var(--teal); background: rgba(0,212,170,0.05); }
+  .settings-nav-item .sicon { font-size: 16px; width: 20px; text-align: center; }
+  .settings-content { flex: 1; padding: 32px; max-width: 720px; }
+
+  /* SECTION */
+  .settings-section { display: none; }
+  .settings-section.active { display: block; }
+  .section-heading { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.3px; margin-bottom: 6px; }
+  .section-sub { font-size: 13px; color: var(--slate); margin-bottom: 28px; }
+
+  /* CARD */
+  .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 20px; }
+  .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .card-header-icon { font-size: 18px; }
+  .card-header-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 15px; }
+  .card-header-desc { font-size: 12px; color: var(--slate); margin-left: auto; }
+  .card-body { padding: 20px 22px; }
+
+  /* TOGGLE ROW */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .toggle-label .tl-title { font-size: 14px; font-weight: 600; }
+  .toggle-label .tl-desc { font-size: 12px; color: var(--slate); margin-top: 2px; }
+  .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track { position: absolute; inset: 0; background: rgba(255,255,255,0.1); border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+  .toggle input:checked + .toggle-track { background: var(--teal); }
+  .toggle-track::after { content: ''; position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: white; transition: transform 0.2s; }
+  .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+  .form-input { width: 100%; background: var(--navy2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; color: var(--white); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .form-input:focus { border-color: var(--teal); }
+  .form-input::placeholder { color: var(--slate); }
+  select.form-input { cursor: pointer; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-hint { font-size: 11px; color: var(--slate); margin-top: 5px; }
+
+  /* COLOR PICKER */
+  .theme-picker { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .theme-swatch { width: 40px; height: 40px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; position: relative; }
+  .theme-swatch.selected { border-color: white; transform: scale(1.1); }
+  .theme-swatch::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; color: white; opacity: 0; transition: opacity 0.2s; }
+  .theme-swatch.selected::after { opacity: 1; }
+
+  /* MACRO SLIDERS */
+  .macro-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .macro-lbl { font-size: 13px; font-weight: 600; width: 100px; }
+  .macro-slider { flex: 1; -webkit-appearance: none; height: 6px; border-radius: 99px; outline: none; cursor: pointer; }
+  .macro-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; border: 2px solid var(--navy); }
+  .macro-val { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; width: 50px; text-align: right; }
+  #s-pro-slider { background: linear-gradient(90deg,#00D4AA,rgba(255,255,255,0.1)); }
+  #s-pro-slider::-webkit-slider-thumb { background: var(--teal); }
+  #s-carb-slider { background: linear-gradient(90deg,#F5A623,rgba(255,255,255,0.1)); }
+  #s-carb-slider::-webkit-slider-thumb { background: var(--amber); }
+  #s-fat-slider { background: linear-gradient(90deg,#7C3AED,rgba(255,255,255,0.1)); }
+  #s-fat-slider::-webkit-slider-thumb { background: var(--purple); }
+  .macro-pct-bar { display: flex; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .macro-pct-seg { transition: width 0.4s; }
+  .macro-total-note { font-size: 12px; color: var(--slate); margin-top: 8px; }
+  .macro-total-note.warn { color: var(--amber); }
+  .macro-total-note.ok { color: var(--teal); }
+
+  /* STORAGE */
+  .storage-bar-wrap { margin: 16px 0; }
+  .storage-bar-bg { height: 10px; background: rgba(255,255,255,0.06); border-radius: 99px; overflow: hidden; }
+  .storage-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal2)); border-radius: 99px; transition: width 1s; }
+  .storage-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; }
+  .storage-leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ABOUT */
+  .about-logo { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .about-logo-ring { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--teal); display: flex; align-items: center; justify-content: center; font-family: 'Sora', sans-serif; font-weight: 800; font-size: 22px; color: var(--teal); }
+  .about-logo-text .name { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 22px; }
+  .about-logo-text .version { font-size: 12px; color: var(--slate); margin-top: 2px; }
+  .changelog-item { padding: 12px 0; border-bottom: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; }
+  .changelog-item:last-child { border-bottom: none; }
+  .changelog-ver { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 12px; color: var(--teal); background: rgba(0,212,170,0.1); border: 1px solid rgba(0,212,170,0.2); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
+  .changelog-desc { font-size: 13px; line-height: 1.6; color: var(--slate); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--teal); color: var(--navy); padding: 12px 20px; border-radius: 10px; font-weight: 600; font-size: 13px; transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @media(max-width:900px){
+    .sidebar { transform: translateX(-100%); }
+    .main { margin-left: 0; }
+    .settings-wrap { flex-direction: column; }
+    .settings-nav { width: 100%; display: flex; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 0; }
+    .settings-nav-item { border-right: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .settings-nav-item.active { border-right-color: transparent; border-bottom-color: var(--teal); }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo-ring">N</div>
+    <div class="brand-name"><em>Nutri</em>Track</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <a href="dashboard.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="food-log.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      Food Log
+      <span class="nav-badge">Today</span>
+    </a>
+    <a href="macro-calculator.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Macro Calc
+    </a>
+    <a href="bmi-calculator.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+      BMI Calculator
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Reports</div>
+    <a href="download-report.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      Download Data
+    </a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Account</div>
+    <a href="profile.html" class="nav-item">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Profile
+    </a>
+    <a href="settings.html" class="nav-item active">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar-sm" id="user-avatar">A</div>
+      <div class="user-info">
+        <div class="name" id="user-name">Loading...</div>
+        <div class="role">Free Plan</div>
+      </div>
+      <button class="logout-btn" onclick="logout()" title="Logout">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Settings</h1>
+      <p>Customize NutriTrack to fit your lifestyle</p>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-teal" onclick="saveAll()">Save All Changes</button>
+    </div>
+  </div>
+
+  <div class="settings-wrap">
+    <!-- SETTINGS NAV -->
+    <nav class="settings-nav">
+      <div class="settings-nav-item active" onclick="showTab('goals')" data-tab="goals"><span class="sicon">🎯</span> Goals</div>
+      <div class="settings-nav-item" onclick="showTab('nutrition')" data-tab="nutrition"><span class="sicon">🥦</span> Nutrition</div>
+      <div class="settings-nav-item" onclick="showTab('notifications')" data-tab="notifications"><span class="sicon">🔔</span> Notifications</div>
+      <div class="settings-nav-item" onclick="showTab('appearance')" data-tab="appearance"><span class="sicon">🎨</span> Appearance</div>
+      <div class="settings-nav-item" onclick="showTab('data')" data-tab="data"><span class="sicon">💾</span> Data & Privacy</div>
+      <div class="settings-nav-item" onclick="showTab('about')" data-tab="about"><span class="sicon">ℹ️</span> About</div>
+    </nav>
+
+    <!-- SETTINGS CONTENT -->
+    <div class="settings-content">
+
+      <!-- GOALS -->
+      <div class="settings-section active" id="tab-goals">
+        <div class="section-heading">Daily Goals</div>
+        <div class="section-sub">Set your daily nutrition targets. These drive all your progress bars and reports.</div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🔥</span>
+            <span class="card-header-title">Calorie Target</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Daily Calorie Goal (kcal)</label>
+              <input type="number" class="form-input" id="s-calories" placeholder="2000" min="800" max="6000">
+              <div class="form-hint">Recommended: 1500–2500 kcal for most adults. Use the Macro Calculator for a precise TDEE.</div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Weight Goal (kg)</label>
+                <input type="number" class="form-input" id="s-target-weight" placeholder="70" min="30" max="300" step="0.1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Weekly Weight Change</label>
+                <select class="form-input" id="s-rate">
+                  <option value="-1.0">Lose 1.0 kg/week (aggressive)</option>
+                  <option value="-0.5" selected>Lose 0.5 kg/week (moderate)</option>
+                  <option value="0">Maintain weight</option>
+                  <option value="0.25">Gain 0.25 kg/week (lean bulk)</option>
+                  <option value="0.5">Gain 0.5 kg/week (bulk)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">💧</span>
+            <span class="card-header-title">Hydration Goal</span>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Daily Water Goal (ml)</label>
+                <input type="number" class="form-input" id="s-water" placeholder="2500" min="500" max="6000" step="100">
+                <div class="form-hint">General guideline: 2000–3000 ml per day.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Cup Size (ml)</label>
+                <select class="form-input" id="s-cup-size">
+                  <option value="150">150 ml (small cup)</option>
+                  <option value="200">200 ml (glass)</option>
+                  <option value="250" selected>250 ml (standard)</option>
+                  <option value="350">350 ml (large glass)</option>
+                  <option value="500">500 ml (bottle)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📊</span>
+            <span class="card-header-title">Macro Targets</span>
+          </div>
+          <div class="card-body">
+            <div class="macro-row">
+              <div class="macro-lbl" style="color:var(--teal)">Protein</div>
+              <input type="range" class="macro-slider" id="s-pro-slider" min="50" max="400" step="5" value="150" oninput="updateMacroSliders()">
+              <div class="macro-val" id="s-pro-val" style="color:var(--teal)">150g</div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-lbl" style="color:var(--amber)">Carbs</div>
+              <input type="range" class="macro-slider" id="s-carb-slider" min="50" max="600" step="5" value="250" oninput="updateMacroSliders()">
+              <div class="macro-val" id="s-carb-val" style="color:var(--amber)">250g</div>
+            </div>
+            <div class="macro-row">
+              <div class="macro-lbl" style="color:#A78BFA">Fats</div>
+              <input type="range" class="macro-slider" id="s-fat-slider" min="20" max="200" step="5" value="65" oninput="updateMacroSliders()">
+              <div class="macro-val" id="s-fat-val" style="color:#A78BFA">65g</div>
+            </div>
+            <div class="macro-pct-bar" id="macro-pct-bar">
+              <div class="macro-pct-seg" style="background:var(--teal)" id="mpb-pro"></div>
+              <div class="macro-pct-seg" style="background:var(--amber)" id="mpb-carb"></div>
+              <div class="macro-pct-seg" style="background:#A78BFA" id="mpb-fat"></div>
+            </div>
+            <div class="macro-total-note" id="macro-kcal-note">≈ 2210 kcal from macros</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NUTRITION -->
+      <div class="settings-section" id="tab-nutrition">
+        <div class="section-heading">Nutrition Preferences</div>
+        <div class="section-sub">Configure dietary preferences and how nutrients are displayed.</div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🥗</span>
+            <span class="card-header-title">Dietary Preferences</span>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Vegetarian Mode</div>
+                <div class="tl-desc">Filter out meat products in food search</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-vegetarian"><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Vegan Mode</div>
+                <div class="tl-desc">Filter out all animal products</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-vegan"><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Gluten Free</div>
+                <div class="tl-desc">Highlight foods containing gluten</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-gluten"><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Dairy Free</div>
+                <div class="tl-desc">Highlight foods containing dairy</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-dairy"><span class="toggle-track"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📐</span>
+            <span class="card-header-title">Units & Display</span>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Weight Unit</label>
+                <select class="form-input" id="s-weight-unit">
+                  <option value="kg" selected>Kilograms (kg)</option>
+                  <option value="lbs">Pounds (lbs)</option>
+                  <option value="st">Stone (st)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Height Unit</label>
+                <select class="form-input" id="s-height-unit">
+                  <option value="cm" selected>Centimetres (cm)</option>
+                  <option value="ft">Feet & Inches</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Energy Unit</label>
+                <select class="form-input" id="s-energy-unit">
+                  <option value="kcal" selected>Kilocalories (kcal)</option>
+                  <option value="kj">Kilojoules (kJ)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Serving (g)</label>
+                <select class="form-input" id="s-serving">
+                  <option value="50">50g</option>
+                  <option value="100" selected>100g (standard)</option>
+                  <option value="150">150g</option>
+                  <option value="200">200g</option>
+                </select>
+              </div>
+            </div>
+            <div class="toggle-row" style="padding-top:8px;">
+              <div class="toggle-label">
+                <div class="tl-title">Show Micronutrients</div>
+                <div class="tl-desc">Display fiber, vitamins, and minerals in food log</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-micros" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Show Meal Timestamps</div>
+                <div class="tl-desc">Display time logged next to each meal</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-timestamps" checked><span class="toggle-track"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🍽️</span>
+            <span class="card-header-title">Meal Schedule</span>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Number of Meals per Day</label>
+              <select class="form-input" id="s-meals-count">
+                <option value="2">2 meals</option>
+                <option value="3" selected>3 meals</option>
+                <option value="4">4 meals</option>
+                <option value="5">5 meals + snacks</option>
+                <option value="6">6 meals (frequent eating)</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Day Start Time</label>
+                <input type="time" class="form-input" id="s-day-start" value="06:00">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Day End Time</label>
+                <input type="time" class="form-input" id="s-day-end" value="22:00">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="settings-section" id="tab-notifications">
+        <div class="section-heading">Notifications</div>
+        <div class="section-sub">Choose what reminders NutriTrack shows you throughout the day.</div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🔔</span>
+            <span class="card-header-title">Meal Reminders</span>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Breakfast Reminder</div>
+                <div class="tl-desc">Remind me to log breakfast</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-breakfast" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="form-group" style="padding-left:0;margin-top:8px;margin-bottom:0;">
+              <input type="time" class="form-input" id="s-breakfast-time" value="08:00" style="max-width:160px;">
+            </div>
+            <div class="toggle-row" style="padding-top:16px;">
+              <div class="toggle-label">
+                <div class="tl-title">Lunch Reminder</div>
+                <div class="tl-desc">Remind me to log lunch</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-lunch" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="form-group" style="margin-top:8px;margin-bottom:0;">
+              <input type="time" class="form-input" id="s-lunch-time" value="13:00" style="max-width:160px;">
+            </div>
+            <div class="toggle-row" style="padding-top:16px;">
+              <div class="toggle-label">
+                <div class="tl-title">Dinner Reminder</div>
+                <div class="tl-desc">Remind me to log dinner</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-dinner" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="form-group" style="margin-top:8px;margin-bottom:0;">
+              <input type="time" class="form-input" id="s-dinner-time" value="19:00" style="max-width:160px;">
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">⚡</span>
+            <span class="card-header-title">Health Reminders</span>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Hydration Reminders</div>
+                <div class="tl-desc">Remind me to drink water every 2 hours</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-water" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Weekly Summary</div>
+                <div class="tl-desc">Send a summary of my week every Sunday</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-weekly"><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Streak Alerts</div>
+                <div class="tl-desc">Notify me if I'm about to break my logging streak</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-streak" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Goal Reached Alerts</div>
+                <div class="tl-desc">Celebrate when I hit my daily calorie or macro goals</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-notif-goals" checked><span class="toggle-track"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPEARANCE -->
+      <div class="settings-section" id="tab-appearance">
+        <div class="section-heading">Appearance</div>
+        <div class="section-sub">Personalise how NutriTrack looks for you.</div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🎨</span>
+            <span class="card-header-title">Accent Color</span>
+          </div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--slate);margin-bottom:14px;">Choose your primary accent color used across the app.</p>
+            <div class="theme-picker" id="color-picker">
+              <div class="theme-swatch selected" data-color="#00D4AA" style="background:#00D4AA" onclick="selectColor(this)" title="Teal (default)"></div>
+              <div class="theme-swatch" data-color="#4F8EF7" style="background:#4F8EF7" onclick="selectColor(this)" title="Blue"></div>
+              <div class="theme-swatch" data-color="#7C3AED" style="background:#7C3AED" onclick="selectColor(this)" title="Purple"></div>
+              <div class="theme-swatch" data-color="#F5A623" style="background:#F5A623" onclick="selectColor(this)" title="Amber"></div>
+              <div class="theme-swatch" data-color="#FF4D6D" style="background:#FF4D6D" onclick="selectColor(this)" title="Rose"></div>
+              <div class="theme-swatch" data-color="#10B981" style="background:#10B981" onclick="selectColor(this)" title="Emerald"></div>
+              <div class="theme-swatch" data-color="#F43F5E" style="background:#F43F5E" onclick="selectColor(this)" title="Pink"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📊</span>
+            <span class="card-header-title">Dashboard Layout</span>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Show Calorie Ring</div>
+                <div class="tl-desc">Display animated calorie ring on dashboard</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-show-ring" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Show Quick Actions</div>
+                <div class="tl-desc">Show the quick navigation cards</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-show-quick" checked><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Compact Macro Cards</div>
+                <div class="tl-desc">Use a condensed layout for macro progress</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-compact-macros"><span class="toggle-track"></span></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Animated Progress Bars</div>
+                <div class="tl-desc">Animate bars when the page loads</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-animate" checked><span class="toggle-track"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🌐</span>
+            <span class="card-header-title">Language & Region</span>
+          </div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Language</label>
+                <select class="form-input" id="s-lang">
+                  <option value="en" selected>English</option>
+                  <option value="es">Español</option>
+                  <option value="fr">Français</option>
+                  <option value="de">Deutsch</option>
+                  <option value="pt">Português</option>
+                  <option value="hi">हिन्दी</option>
+                  <option value="ta">தமிழ்</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Date Format</label>
+                <select class="form-input" id="s-date-fmt">
+                  <option value="mdy">MM/DD/YYYY</option>
+                  <option value="dmy" selected>DD/MM/YYYY</option>
+                  <option value="ymd">YYYY-MM-DD</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="settings-section" id="tab-data">
+        <div class="section-heading">Data & Privacy</div>
+        <div class="section-sub">Manage your NutriTrack data stored locally in your browser.</div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">💾</span>
+            <span class="card-header-title">Storage Usage</span>
+          </div>
+          <div class="card-body">
+            <div class="storage-bar-wrap">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <span style="font-size:13px;font-weight:600;">Local Storage</span>
+                <span style="font-size:13px;color:var(--teal);font-weight:700;" id="storage-used-label">0 KB / 5 MB</span>
+              </div>
+              <div class="storage-bar-bg"><div class="storage-bar-fill" id="storage-bar" style="width:0%"></div></div>
+            </div>
+            <div class="storage-legend" id="storage-legend"></div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📤</span>
+            <span class="card-header-title">Export Data</span>
+          </div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--slate);margin-bottom:16px;line-height:1.6;">Download a full copy of your NutriTrack data for backup or to migrate to another device.</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-ghost" onclick="exportJSON()">📋 Export JSON</button>
+              <button class="btn btn-ghost" onclick="exportCSV()">📊 Export CSV</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📥</span>
+            <span class="card-header-title">Import Data</span>
+          </div>
+          <div class="card-body">
+            <p style="font-size:13px;color:var(--slate);margin-bottom:16px;line-height:1.6;">Restore from a NutriTrack JSON backup file. This will merge with your existing data.</p>
+            <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(this)">
+            <button class="btn btn-ghost" onclick="document.getElementById('import-file').click()">📂 Choose File to Import</button>
+          </div>
+        </div>
+
+        <div class="settings-card" style="border-color:rgba(255,77,109,0.2);">
+          <div class="card-header">
+            <span class="card-header-icon">⚠️</span>
+            <span class="card-header-title" style="color:var(--red);">Danger Zone</span>
+          </div>
+          <div class="card-body">
+            <div class="toggle-row">
+              <div class="toggle-label">
+                <div class="tl-title">Analytics & Usage Data</div>
+                <div class="tl-desc">All data is stored locally — NutriTrack never sends data to any server</div>
+              </div>
+              <label class="toggle"><input type="checkbox" id="t-analytics" checked disabled><span class="toggle-track"></span></label>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+              <button class="btn btn-danger" onclick="clearFoodLog()">🗑️ Clear Food Log</button>
+              <button class="btn btn-danger" onclick="clearWeights()">⚖️ Clear Weight History</button>
+              <button class="btn btn-danger" onclick="clearAll()">💥 Reset Everything</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABOUT -->
+      <div class="settings-section" id="tab-about">
+        <div class="section-heading">About NutriTrack</div>
+        <div class="section-sub">Version info and what's new.</div>
+
+        <div class="settings-card">
+          <div class="card-body">
+            <div class="about-logo">
+              <div class="about-logo-ring">N</div>
+              <div class="about-logo-text">
+                <div class="name"><em style="color:var(--teal);font-style:normal">Nutri</em>Track</div>
+                <div class="version">Version 1.0.0 — Free Edition</div>
+              </div>
+            </div>
+            <p style="font-size:13px;color:var(--slate);line-height:1.7;max-width:520px;">NutriTrack is a privacy-first nutrition tracking app. All your data lives in your browser's local storage — nothing is ever sent to a server.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">📋</span>
+            <span class="card-header-title">Changelog</span>
+          </div>
+          <div class="card-body">
+            <div class="changelog-item">
+              <span class="changelog-ver">v1.0.0</span>
+              <span class="changelog-desc">Initial release — Dashboard, Food Log (18 foods), BMI Calculator, Macro Calculator, Download Reports, Profile, and Settings.</span>
+            </div>
+            <div class="changelog-item">
+              <span class="changelog-ver">v0.9.0</span>
+              <span class="changelog-desc">Beta — Calorie ring, macro progress bars, weight history chart, and streak tracking added.</span>
+            </div>
+            <div class="changelog-item">
+              <span class="changelog-ver">v0.8.0</span>
+              <span class="changelog-desc">Alpha — Core food logging and localStorage persistence established.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="card-header">
+            <span class="card-header-icon">🔗</span>
+            <span class="card-header-title">App Pages</span>
+          </div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <a href="dashboard.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">🏠 Dashboard</a>
+              <a href="food-log.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">🥗 Food Log</a>
+              <a href="macro-calculator.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">📊 Macro Calc</a>
+              <a href="bmi-calculator.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">⚖️ BMI Calc</a>
+              <a href="download-report.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">📥 Reports</a>
+              <a href="README.html" style="text-decoration:none;display:flex;align-items:center;gap:10px;padding:12px;background:var(--navy2);border:1px solid var(--border);border-radius:10px;color:var(--white);font-size:13px;font-weight:500;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">📖 README</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /settings-content -->
+  </div><!-- /settings-wrap -->
+</div><!-- /main -->
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { requireAuth, logoutUser } from "./auth.js";
+
+  const BASE = "http://localhost:3001";
+
+  window.logout = logoutUser;
+
+  let token = null;
+
+  requireAuth(async (t, user) => {
+    token = t;
+    await loadSettings();
+  });
+
+  async function api(path, method = "GET", body = null) {
+    const opts = {
+      method,
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${BASE}${path}`, opts);
+    return res.json();
+  }
+
+  async function loadSettings() {
+    try {
+      const [profile, prefs] = await Promise.all([
+        api("/api/profile"),
+        api("/api/prefs"),
+      ]);
+
+      const fname = profile?.fname || "User";
+      const lname = profile?.lname || "";
+      document.getElementById("user-avatar").textContent =
+        ((fname[0]||"")+(lname[0]||"")).toUpperCase() || "U";
+      document.getElementById("user-name").textContent =
+        `${fname} ${lname}`.trim();
+
+      if (prefs.calories)  document.getElementById("s-calories").value      = prefs.calories;
+      if (prefs.protein)   document.getElementById("s-pro-slider").value    = prefs.protein;
+      if (prefs.carbs)     document.getElementById("s-carb-slider").value   = prefs.carbs;
+      if (prefs.fat)       document.getElementById("s-fat-slider").value    = prefs.fat;
+      if (prefs.waterGoal) document.getElementById("s-water").value         = prefs.waterGoal;
+      if (prefs.cupSize)   document.getElementById("s-cup-size").value      = prefs.cupSize;
+      if (prefs.weightUnit)  document.getElementById("s-weight-unit").value = prefs.weightUnit;
+      if (prefs.heightUnit)  document.getElementById("s-height-unit").value = prefs.heightUnit;
+      if (prefs.energyUnit)  document.getElementById("s-energy-unit").value = prefs.energyUnit;
+
+      const toggleMap = {
+        "t-vegetarian":"vegetarian",   "t-vegan":"vegan",
+        "t-gluten":"glutenFree",       "t-dairy":"dairyFree",
+        "t-micros":"showMicros",       "t-timestamps":"showTimestamps",
+        "t-notif-breakfast":"notifBreakfast", "t-notif-lunch":"notifLunch",
+        "t-notif-dinner":"notifDinner",       "t-notif-water":"notifWater",
+        "t-notif-weekly":"notifWeekly",       "t-notif-streak":"notifStreak",
+        "t-notif-goals":"notifGoals",
+        "t-show-ring":"showRing",      "t-show-quick":"showQuick",
+        "t-compact-macros":"compactMacros",   "t-animate":"animate",
+      };
+      Object.entries(toggleMap).forEach(([id, key]) => {
+        if (prefs[key] !== undefined)
+          document.getElementById(id).checked = prefs[key];
+      });
+
+      const selectMap = {
+        "s-serving":"serving",         "s-meals-count":"mealsCount",
+        "s-lang":"language",           "s-date-fmt":"dateFmt",
+        "s-rate":"weightRate",
+      };
+      Object.entries(selectMap).forEach(([id, key]) => {
+        if (prefs[key]) document.getElementById(id).value = prefs[key];
+      });
+
+      const timeMap = {
+        "s-breakfast-time":"breakfastTime", "s-lunch-time":"lunchTime",
+        "s-dinner-time":"dinnerTime",       "s-day-start":"dayStart",
+        "s-day-end":"dayEnd",
+      };
+      Object.entries(timeMap).forEach(([id, key]) => {
+        if (prefs[key]) document.getElementById(id).value = prefs[key];
+      });
+
+      const accent = prefs.accentColor || localStorage.getItem("nt_accent_color");
+      if (accent) {
+        document.querySelectorAll(".theme-swatch").forEach(s =>
+          s.classList.toggle("selected", s.dataset.color === accent)
+        );
+      }
+
+      updateMacroSliders();
+      updateStorage();
+
+    } catch (e) { console.error("Settings load error:", e); }
+  }
+
+  window.saveAll = async () => {
+    const prefs = {
+      calories:   parseInt(document.getElementById("s-calories").value)    || 2000,
+      protein:    parseInt(document.getElementById("s-pro-slider").value)  || 150,
+      carbs:      parseInt(document.getElementById("s-carb-slider").value) || 250,
+      fat:        parseInt(document.getElementById("s-fat-slider").value)  || 65,
+      waterGoal:  parseInt(document.getElementById("s-water").value)       || 2500,
+      cupSize:    parseInt(document.getElementById("s-cup-size").value)    || 250,
+      weightUnit: document.getElementById("s-weight-unit").value,
+      heightUnit: document.getElementById("s-height-unit").value,
+      energyUnit: document.getElementById("s-energy-unit").value,
+      serving:    document.getElementById("s-serving").value,
+      mealsCount: document.getElementById("s-meals-count").value,
+      language:   document.getElementById("s-lang").value,
+      dateFmt:    document.getElementById("s-date-fmt").value,
+      weightRate: document.getElementById("s-rate").value,
+      dayStart:   document.getElementById("s-day-start").value,
+      dayEnd:     document.getElementById("s-day-end").value,
+      breakfastTime: document.getElementById("s-breakfast-time").value,
+      lunchTime:     document.getElementById("s-lunch-time").value,
+      dinnerTime:    document.getElementById("s-dinner-time").value,
+      vegetarian:    document.getElementById("t-vegetarian").checked,
+      vegan:         document.getElementById("t-vegan").checked,
+      glutenFree:    document.getElementById("t-gluten").checked,
+      dairyFree:     document.getElementById("t-dairy").checked,
+      showMicros:    document.getElementById("t-micros").checked,
+      showTimestamps:document.getElementById("t-timestamps").checked,
+      notifBreakfast:document.getElementById("t-notif-breakfast").checked,
+      notifLunch:    document.getElementById("t-notif-lunch").checked,
+      notifDinner:   document.getElementById("t-notif-dinner").checked,
+      notifWater:    document.getElementById("t-notif-water").checked,
+      notifWeekly:   document.getElementById("t-notif-weekly").checked,
+      notifStreak:   document.getElementById("t-notif-streak").checked,
+      notifGoals:    document.getElementById("t-notif-goals").checked,
+      showRing:      document.getElementById("t-show-ring").checked,
+      showQuick:     document.getElementById("t-show-quick").checked,
+      compactMacros: document.getElementById("t-compact-macros").checked,
+      animate:       document.getElementById("t-animate").checked,
+      accentColor:   localStorage.getItem("nt_accent_color") || "#00D4AA",
+    };
+    try {
+      await api("/api/prefs", "PUT", prefs);
+      showToast("✅ Settings saved!");
+    } catch (e) { showToast("❌ Save failed", "var(--red)"); }
+  };
+
+  window.showTab = name => {
+    document.querySelectorAll(".settings-section").forEach(s => s.classList.remove("active"));
+    document.querySelectorAll(".settings-nav-item").forEach(n => n.classList.remove("active"));
+    document.getElementById("tab-"+name).classList.add("active");
+    document.querySelector(`[data-tab="${name}"]`).classList.add("active");
+  };
+
+  window.updateMacroSliders = () => {
+    const pro  = parseInt(document.getElementById("s-pro-slider").value);
+    const carb = parseInt(document.getElementById("s-carb-slider").value);
+    const fat  = parseInt(document.getElementById("s-fat-slider").value);
+    document.getElementById("s-pro-val").textContent  = pro  + "g";
+    document.getElementById("s-carb-val").textContent = carb + "g";
+    document.getElementById("s-fat-val").textContent  = fat  + "g";
+    const total = pro*4 + carb*4 + fat*9;
+    document.getElementById("mpb-pro").style.width  = ((pro*4/total)*100) + "%";
+    document.getElementById("mpb-carb").style.width = ((carb*4/total)*100) + "%";
+    document.getElementById("mpb-fat").style.width  = ((fat*9/total)*100) + "%";
+    const note = document.getElementById("macro-kcal-note");
+    note.textContent = `≈ ${total} kcal from macros`;
+    note.className   = "macro-total-note ok";
+  };
+
+  window.selectColor = el => {
+    document.querySelectorAll(".theme-swatch").forEach(s => s.classList.remove("selected"));
+    el.classList.add("selected");
+    localStorage.setItem("nt_accent_color", el.dataset.color);
+  };
+
+  window.exportJSON = async () => {
+    try {
+      const [profile, prefs, weights, streak] = await Promise.all([
+        api("/api/profile"), api("/api/prefs"),
+        api("/api/weights?count=90"), api("/api/streak"),
+      ]);
+      const blob = new Blob([JSON.stringify({ profile, prefs, weights, streak }, null, 2)],
+        { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `nutritrack-backup-${new Date().toISOString().split("T")[0]}.json`;
+      a.click();
+      showToast("📋 JSON exported!");
+    } catch (e) { showToast("❌ Export failed", "var(--red)"); }
+  };
+
+  window.exportCSV = async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const past  = new Date(Date.now() - 30*86400000).toISOString().split("T")[0];
+      const log   = await api(`/api/log?from=${past}&to=${today}`);
+      const rows  = [["Date","Meal","Food","Calories","Protein(g)","Carbs(g)","Fat(g)","Serving(g)"]];
+      Object.entries(log).forEach(([date, day]) => {
+        (day.meals||[]).forEach(m => {
+          rows.push([date, m.type||"", m.name, m.calories||0,
+            m.protein||0, m.carbs||0, m.fat||0, m.serving||100]);
+        });
+      });
+      const blob = new Blob([rows.map(r => r.join(",")).join("\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `nutritrack-food-log-${today}.csv`;
+      a.click();
+      showToast("📊 CSV exported!");
+    } catch (e) { showToast("❌ Export failed", "var(--red)"); }
+  };
+
+  window.importData = input => {
+    const file = input.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        JSON.parse(e.target.result);
+        showToast("✅ File validated! API import coming soon.");
+      } catch { showToast("❌ Invalid file", "var(--red)"); }
+    };
+    reader.readAsText(file);
+  };
+
+  window.clearFoodLog = async () => {
+    if (!confirm("Clear today's food log?")) return;
+    const today = new Date().toISOString().split("T")[0];
+    await api(`/api/log/${today}`, "DELETE");
+    showToast("🗑️ Food log cleared", "var(--red)");
+    updateStorage();
+  };
+
+  window.clearWeights = async () => {
+    if (!confirm("Clear all weight history?")) return;
+    const weights = await api("/api/weights?count=90");
+    for (const w of weights) await api(`/api/weights/${w.id}`, "DELETE");
+    showToast("🗑️ Weight history cleared", "var(--red)");
+    updateStorage();
+  };
+
+  window.clearAll = async () => {
+    if (!confirm("Reset ALL NutriTrack data? This cannot be undone.")) return;
+    if (!confirm("Are you absolutely sure?")) return;
+    await api("/api/profile", "DELETE");
+    await logoutUser();
+  };
+
+  function updateStorage() {
+    document.getElementById("storage-bar").style.width = "2%";
+    document.getElementById("storage-used-label").textContent = "Stored in Firestore cloud";
+    document.getElementById("storage-legend").innerHTML =
+      `<div class="storage-leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Data stored in Firestore cloud</div>`;
+  }
+
+  window.showToast = (msg, color = "var(--teal)") => {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.style.background = color;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2800);
+  };
+</script>
+</body>
+</html>

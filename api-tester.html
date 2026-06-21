@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriTrack — API Test Runner</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #080D1A; --bg2: #0E1525; --card: #121B2E; --card2: #172035;
+  --teal: #00D4AA; --teal2: #00B492; --amber: #F5A623; --purple: #7C3AED;
+  --red: #FF4D6D; --green: #22C55E; --blue: #4F8EF7;
+  --white: #EEF2FF; --slate: #8892A4; --border: rgba(255,255,255,0.07);
+  --font-mono: 'JetBrains Mono', monospace;
+}
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--white); min-height: 100vh; }
+
+/* TOPBAR */
+.topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
+.topbar-logo { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 17px; }
+.topbar-logo em { color: var(--teal); font-style: normal; }
+.topbar-sep { width: 1px; height: 20px; background: var(--border); }
+.topbar-title { font-size: 13px; font-weight: 600; color: var(--slate); letter-spacing: 0.5px; text-transform: uppercase; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.run-all-btn { background: var(--teal); color: #081018; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; border: none; border-radius: 9px; padding: 9px 22px; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 8px; }
+.run-all-btn:hover { background: var(--teal2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,212,170,0.25); }
+.run-all-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.clear-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--slate); font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; border-radius: 9px; padding: 9px 18px; cursor: pointer; transition: all 0.18s; }
+.clear-btn:hover { color: var(--white); background: rgba(255,255,255,0.09); }
+
+/* LAYOUT */
+.layout { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 60px); }
+
+/* SIDEBAR */
+.sidebar { background: var(--card); border-right: 1px solid var(--border); padding: 20px 0; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* CONFIG SECTION */
+.config-section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.config-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--slate); margin-bottom: 8px; }
+.config-input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; color: var(--white); font-family: var(--font-mono); font-size: 11.5px; outline: none; transition: border-color 0.18s; }
+.config-input:focus { border-color: var(--teal); }
+.config-input::placeholder { color: var(--slate); }
+.token-wrap { position: relative; }
+.token-wrap .config-input { padding-right: 36px; }
+.token-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--slate); font-size: 14px; transition: color 0.18s; }
+.token-eye:hover { color: var(--white); }
+
+/* SUMMARY BAR */
+.summary-bar { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; gap: 16px; }
+.sum-item { text-align: center; }
+.sum-val { font-family: 'Sora', sans-serif; font-weight: 800; font-size: 20px; }
+.sum-lbl { font-size: 10px; color: var(--slate); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.sum-val.pass { color: var(--green); }
+.sum-val.fail { color: var(--red); }
+.sum-val.skip { color: var(--slate); }
+.sum-val.total { color: var(--white); }
+
+/* SUITE LIST */
+.suite-section { padding: 10px 0; }
+.suite-header { padding: 8px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--slate); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: color 0.15s; }
+.suite-header:hover { color: var(--white); }
+.suite-header .suite-badges { display: flex; gap: 5px; }
+.suite-item { padding: 9px 20px 9px 30px; font-size: 12.5px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s; border-left: 2px solid transparent; color: var(--slate); }
+.suite-item:hover { background: rgba(255,255,255,0.04); color: var(--white); }
+.suite-item.active { background: rgba(0,212,170,0.07); color: var(--teal); border-left-color: var(--teal); }
+.suite-item.running { color: var(--amber); }
+.test-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; background: var(--slate); }
+.test-dot.pass { background: var(--green); }
+.test-dot.fail { background: var(--red); }
+.test-dot.running { background: var(--amber); animation: pulse 0.8s ease-in-out infinite; }
+.test-dot.skip { background: var(--slate); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* MAIN CONTENT */
+.main { overflow-y: auto; padding: 28px 32px; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 12px; text-align: center; }
+.empty-icon { font-size: 48px; margin-bottom: 8px; }
+.empty-title { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 20px; }
+.empty-sub { font-size: 14px; color: var(--slate); max-width: 380px; line-height: 1.6; }
+
+/* TEST DETAIL */
+.test-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+.test-method { font-family: var(--font-mono); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 5px; flex-shrink: 0; margin-top: 3px; }
+.method-get { background: rgba(79,142,247,0.15); color: var(--blue); }
+.method-post { background: rgba(34,197,94,0.15); color: var(--green); }
+.method-patch { background: rgba(245,166,35,0.15); color: var(--amber); }
+.method-put { background: rgba(124,58,237,0.15); color: #A78BFA; }
+.method-delete { background: rgba(255,77,109,0.15); color: var(--red); }
+.test-meta .test-name { font-family: 'Sora', sans-serif; font-weight: 700; font-size: 19px; }
+.test-meta .test-path { font-family: var(--font-mono); font-size: 12px; color: var(--slate); margin-top: 5px; }
+.test-meta .test-desc { font-size: 13px; color: var(--slate); margin-top: 6px; line-height: 1.6; }
+.run-btn { margin-left: auto; background: var(--teal); color: #081018; font-family: 'Inter', sans-serif; font-weight: 700; font-size: 13px; border: none; border-radius: 9px; padding: 10px 22px; cursor: pointer; white-space: nowrap; flex-shrink: 0; transition: all 0.18s; }
+.run-btn:hover { background: var(--teal2); }
+.run-btn:disabled { opacity:0.5; cursor:not-allowed; }
+
+/* SECTIONS */
+.section { background: var(--card); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 16px; overflow: hidden; }
+.section-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--slate); }
+.section-body { padding: 16px 18px; }
+
+/* REQUEST BODY EDITOR */
+.body-editor { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; color: var(--white); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; resize: vertical; min-height: 80px; outline: none; transition: border-color 0.18s; }
+.body-editor:focus { border-color: var(--teal); }
+
+/* STATUS BADGE */
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.status-pass { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.status-fail { background: rgba(255,77,109,0.12); color: var(--red); border: 1px solid rgba(255,77,109,0.2); }
+.status-pending { background: rgba(136,146,164,0.12); color: var(--slate); border: 1px solid rgba(136,146,164,0.15); }
+.status-running { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+
+/* RESPONSE */
+.res-meta { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+.res-code { font-family: var(--font-mono); font-weight: 700; font-size: 16px; }
+.res-code.ok { color: var(--green); }
+.res-code.err { color: var(--red); }
+.res-code.warn { color: var(--amber); }
+.res-time { font-size: 12px; color: var(--slate); }
+.res-size { font-size: 12px; color: var(--slate); }
+.code-block { background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 14px 16px; font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7; overflow-x: auto; max-height: 280px; overflow-y: auto; white-space: pre; color: #A8D8C8; }
+.code-block::-webkit-scrollbar { width: 4px; height: 4px; }
+.code-block::-webkit-scrollbar-track { background: transparent; }
+.code-block::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ASSERTIONS */
+.assertion-list { display: flex; flex-direction: column; gap: 8px; }
+.assertion { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: var(--bg2); border-radius: 8px; border: 1px solid var(--border); font-size: 12.5px; }
+.assertion-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.assertion-text { color: var(--slate); flex: 1; }
+.assertion.pass { border-color: rgba(34,197,94,0.2); }
+.assertion.pass .assertion-icon::before { content: '✓'; color: var(--green); }
+.assertion.fail { border-color: rgba(255,77,109,0.2); }
+.assertion.fail .assertion-icon::before { content: '✗'; color: var(--red); }
+.assertion.pending .assertion-icon::before { content: '○'; color: var(--slate); }
+.assertion-detail { font-family: var(--font-mono); font-size: 11px; color: var(--red); margin-top: 4px; }
+
+/* TIMING BAR */
+.timing-row { display: grid; grid-template-columns: 120px 1fr 60px; align-items: center; gap: 10px; margin-bottom: 6px; }
+.timing-label { font-size: 11px; color: var(--slate); }
+.timing-bar-bg { background: rgba(255,255,255,0.06); border-radius: 99px; height: 5px; overflow: hidden; }
+.timing-bar-fill { height: 100%; border-radius: 99px; background: var(--teal); transition: width 0.6s; }
+.timing-val { font-family: var(--font-mono); font-size: 11px; color: var(--white); text-align: right; }
+
+/* PROGRESS BAR */
+.progress-wrap { height: 3px; background: rgba(255,255,255,0.05); }
+.progress-fill { height: 100%; background: var(--teal); transition: width 0.3s; }
+
+/* COPY BTN */
+.copy-btn { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--slate); font-size: 11px; padding: 4px 10px; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.15s; margin-left: auto; }
+.copy-btn:hover { color: var(--white); border-color: rgba(255,255,255,0.2); }
+
+@media(max-width:860px){
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; }
+  .main { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo"><em>Nutri</em>Track</div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-title">API Test Runner</div>
+  <div class="topbar-right">
+    <button class="clear-btn" onclick="clearResults()">Clear Results</button>
+    <button class="run-all-btn" id="run-all-btn" onclick="runAll()">▶ Run All Tests</button>
+  </div>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <!-- CONFIG -->
+    <div class="config-section">
+      <div class="config-label">Base URL</div>
+      <input type="text" class="config-input" id="cfg-base" value="http://localhost:3001" placeholder="http://localhost:3001">
+    </div>
+    <div class="config-section">
+      <div class="config-label">Firebase ID Token</div>
+      <div class="token-wrap">
+        <input type="password" class="config-input" id="cfg-token" placeholder="Paste Firebase ID token…">
+        <button class="token-eye" onclick="toggleToken()">👁</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary-bar">
+      <div class="sum-item"><div class="sum-val total" id="s-total">0</div><div class="sum-lbl">Total</div></div>
+      <div class="sum-item"><div class="sum-val pass" id="s-pass">0</div><div class="sum-lbl">Pass</div></div>
+      <div class="sum-item"><div class="sum-val fail" id="s-fail">0</div><div class="sum-lbl">Fail</div></div>
+      <div class="sum-item"><div class="sum-val skip" id="s-skip">0</div><div class="sum-lbl">Pending</div></div>
+    </div>
+
+    <!-- TEST LIST -->
+    <div class="suite-section" id="suite-list"></div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main-panel">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">🧪</div>
+      <div class="empty-title">Select a test to inspect it</div>
+      <div class="empty-sub">Configure your base URL and Firebase ID token above, then run individual tests or click "Run All Tests" to execute the full suite.</div>
+    </div>
+    <div id="test-detail" style="display:none"></div>
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  TEST DEFINITIONS
+// ═══════════════════════════════════════════════════════════
+const SUITES = [
+  {
+    id: 'health',
+    label: 'Health Check',
+    tests: [
+      {
+        id: 'health_check',
+        name: 'Server is running',
+        method: 'GET',
+        path: '/health',
+        auth: false,
+        body: null,
+        desc: 'Verifies the Express server is reachable and returns status ok.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Body has status: ok', fn: r => r.json?.status === 'ok' },
+          { label: 'Body has ts (timestamp)', fn: r => !!r.json?.ts },
+          { label: 'Response under 300ms', fn: r => r.time < 300 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'auth',
+    label: 'Auth',
+    tests: [
+      {
+        id: 'auth_me_no_token',
+        name: 'Reject missing token',
+        method: 'GET',
+        path: '/api/auth/me',
+        auth: false,
+        body: null,
+        desc: 'Calling /api/auth/me without a token must return 401.',
+        assertions: [
+          { label: 'Status 401', fn: r => r.status === 401 },
+          { label: 'Body has error field', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'auth_me_bad_token',
+        name: 'Reject invalid token',
+        method: 'GET',
+        path: '/api/auth/me',
+        auth: 'bad',
+        body: null,
+        desc: 'Sending a malformed token must return 401.',
+        assertions: [
+          { label: 'Status 401', fn: r => r.status === 401 },
+          { label: 'Body has error field', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'auth_register',
+        name: 'POST /api/auth/register',
+        method: 'POST',
+        path: '/api/auth/register',
+        auth: true,
+        body: { fname: 'Test', lname: 'User', email: 'test@nutritrack.app', goal: 'maintain' },
+        desc: 'Creates a new profile document in Firestore for the authenticated user. Returns 201 or 409 if already exists.',
+        assertions: [
+          { label: 'Status 201 or 409', fn: r => r.status === 201 || r.status === 409 },
+          { label: 'Body has message or error field', fn: r => !!r.json?.message || !!r.json?.error },
+        ],
+      },
+      {
+        id: 'auth_me',
+        name: 'GET /api/auth/me',
+        method: 'GET',
+        path: '/api/auth/me',
+        auth: true,
+        body: null,
+        desc: 'Returns the profile for the authenticated user. Requires a valid Firebase ID token.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Body has fname', fn: r => r.json?.fname !== undefined },
+          { label: 'Body has email', fn: r => r.json?.email !== undefined },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'profile',
+    label: 'Profile',
+    tests: [
+      {
+        id: 'profile_get',
+        name: 'GET /api/profile',
+        method: 'GET',
+        path: '/api/profile',
+        auth: true,
+        body: null,
+        desc: 'Fetches the full profile document for the authenticated user.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Returns an object', fn: r => typeof r.json === 'object' && r.json !== null },
+        ],
+      },
+      {
+        id: 'profile_patch',
+        name: 'PATCH /api/profile',
+        method: 'PATCH',
+        path: '/api/profile',
+        auth: true,
+        body: { fname: 'Updated', height: 178, weight: 72.5, goal: 'lose' },
+        desc: 'Partial update — only the supplied fields are changed. Returns { message: "Profile updated." }.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'message: "Profile updated."', fn: r => r.json?.message === 'Profile updated.' },
+        ],
+      },
+      {
+        id: 'profile_patch_verify',
+        name: 'Verify PATCH persisted',
+        method: 'GET',
+        path: '/api/profile',
+        auth: true,
+        body: null,
+        desc: 'Reads the profile back after the PATCH to confirm changes were saved.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'fname is "Updated"', fn: r => r.json?.fname === 'Updated' },
+          { label: 'height is 178', fn: r => r.json?.height === 178 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'prefs',
+    label: 'Preferences',
+    tests: [
+      {
+        id: 'prefs_get',
+        name: 'GET /api/prefs',
+        method: 'GET',
+        path: '/api/prefs',
+        auth: true,
+        body: null,
+        desc: 'Returns the user\'s saved preferences / macro goals. Falls back to defaults if none saved.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Has calories field', fn: r => r.json?.calories !== undefined },
+          { label: 'Has protein field', fn: r => r.json?.protein !== undefined },
+          { label: 'Has waterGoal field', fn: r => r.json?.waterGoal !== undefined },
+        ],
+      },
+      {
+        id: 'prefs_put',
+        name: 'PUT /api/prefs',
+        method: 'PUT',
+        path: '/api/prefs',
+        auth: true,
+        body: { calories: 2200, protein: 160, carbs: 260, fat: 70, waterGoal: 3000, cupSize: 250 },
+        desc: 'Full replace of preferences. All macro and hydration goals are overwritten.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Body has message', fn: r => !!r.json?.message },
+        ],
+      },
+      {
+        id: 'prefs_verify',
+        name: 'Verify PUT persisted',
+        method: 'GET',
+        path: '/api/prefs',
+        auth: true,
+        body: null,
+        desc: 'Reads prefs back after the PUT to confirm the new values were saved.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'calories is 2200', fn: r => r.json?.calories === 2200 },
+          { label: 'waterGoal is 3000', fn: r => r.json?.waterGoal === 3000 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'foodlog',
+    label: 'Food Log',
+    tests: [
+      {
+        id: 'log_get_today',
+        name: 'GET /api/log/today',
+        method: 'GET',
+        path: '/api/log/today',
+        auth: true,
+        body: null,
+        desc: 'Returns today\'s food log (meals array + water). Returns empty defaults if no entries yet.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Has meals array', fn: r => Array.isArray(r.json?.meals) },
+          { label: 'Has water field', fn: r => r.json?.water !== undefined },
+        ],
+      },
+      {
+        id: 'log_add_meal',
+        name: 'POST /api/log/today/meals',
+        method: 'POST',
+        path: '/api/log/today/meals',
+        auth: true,
+        body: { name: 'Grilled Chicken', type: 'lunch', calories: 280, protein: 52, carbs: 0, fat: 6, serving: 150 },
+        desc: 'Adds a meal entry to today\'s log. Also triggers a streak update. Returns the saved meal + streak.',
+        assertions: [
+          { label: 'Status 201', fn: r => r.status === 201 },
+          { label: 'Returns meal object', fn: r => !!r.json?.meal },
+          { label: 'Meal has id', fn: r => !!r.json?.meal?.id },
+          { label: 'Returns streak object', fn: r => !!r.json?.streak },
+          { label: 'Streak has count', fn: r => r.json?.streak?.count !== undefined },
+        ],
+      },
+      {
+        id: 'log_add_meal_missing_fields',
+        name: 'Reject meal with no name',
+        method: 'POST',
+        path: '/api/log/today/meals',
+        auth: true,
+        body: { calories: 200 },
+        desc: 'Sending a meal without a name field must return 400 Bad Request.',
+        assertions: [
+          { label: 'Status 400', fn: r => r.status === 400 },
+          { label: 'Body has error', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'log_verify_meal',
+        name: 'Verify meal was added',
+        method: 'GET',
+        path: '/api/log/today',
+        auth: true,
+        body: null,
+        desc: 'Reads today\'s log back to confirm the Grilled Chicken entry is present.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'At least 1 meal in log', fn: r => (r.json?.meals?.length || 0) >= 1 },
+          { label: 'Meal named "Grilled Chicken" exists', fn: r => r.json?.meals?.some(m => m.name === 'Grilled Chicken') },
+        ],
+      },
+      {
+        id: 'log_water',
+        name: 'PATCH /api/log/today/water',
+        method: 'PATCH',
+        path: '/api/log/today/water',
+        auth: true,
+        body: { ml: 1750 },
+        desc: 'Sets the water intake for today. Value is absolute (not additive).',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Returns ml field', fn: r => r.json?.ml === 1750 },
+        ],
+      },
+      {
+        id: 'log_water_invalid',
+        name: 'Reject negative water value',
+        method: 'PATCH',
+        path: '/api/log/today/water',
+        auth: true,
+        body: { ml: -100 },
+        desc: 'Negative ml values must be rejected with 400.',
+        assertions: [
+          { label: 'Status 400', fn: r => r.status === 400 },
+          { label: 'Body has error', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'log_range',
+        name: 'GET /api/log?from=&to=',
+        method: 'GET',
+        path: '/api/log?from=2025-01-01&to=2025-01-07',
+        auth: true,
+        body: null,
+        desc: 'Returns food logs across a date range. Max 90 days enforced.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Returns an object (date → day)', fn: r => typeof r.json === 'object' && r.json !== null },
+        ],
+      },
+      {
+        id: 'log_range_too_wide',
+        name: 'Reject range > 90 days',
+        method: 'GET',
+        path: '/api/log?from=2024-01-01&to=2024-12-31',
+        auth: true,
+        body: null,
+        desc: 'A range wider than 90 days must return 400.',
+        assertions: [
+          { label: 'Status 400', fn: r => r.status === 400 },
+          { label: 'Body has error', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'log_delete_meal',
+        name: 'DELETE meal by id',
+        method: 'DELETE',
+        path: '/api/log/today/meals/__MEAL_ID__',
+        auth: true,
+        body: null,
+        desc: 'Deletes a specific meal by its id from today\'s log. Run "Verify meal was added" first to get a real meal id, then update the path.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'message: "Meal deleted."', fn: r => r.json?.message === 'Meal deleted.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'weights',
+    label: 'Weight History',
+    tests: [
+      {
+        id: 'weight_post',
+        name: 'POST /api/weights',
+        method: 'POST',
+        path: '/api/weights',
+        auth: true,
+        body: { weight: 73.2, note: 'After morning run' },
+        desc: 'Adds a new weight entry. Returns the Firestore document id and the logged weight.',
+        assertions: [
+          { label: 'Status 201', fn: r => r.status === 201 },
+          { label: 'Returns id', fn: r => !!r.json?.id },
+          { label: 'Returns weight 73.2', fn: r => r.json?.weight === 73.2 },
+        ],
+      },
+      {
+        id: 'weight_post_invalid',
+        name: 'Reject non-numeric weight',
+        method: 'POST',
+        path: '/api/weights',
+        auth: true,
+        body: { weight: 'heavy' },
+        desc: 'Sending a string instead of a number must return 400.',
+        assertions: [
+          { label: 'Status 400', fn: r => r.status === 400 },
+          { label: 'Body has error', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'weight_get',
+        name: 'GET /api/weights',
+        method: 'GET',
+        path: '/api/weights?count=10',
+        auth: true,
+        body: null,
+        desc: 'Returns the most recent weight entries (newest first). count param caps the result.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Returns an array', fn: r => Array.isArray(r.json) },
+          { label: 'Each entry has weight field', fn: r => !r.json?.length || r.json.every(e => e.weight !== undefined) },
+          { label: 'Each entry has id field', fn: r => !r.json?.length || r.json.every(e => e.id !== undefined) },
+        ],
+      },
+      {
+        id: 'weight_delete',
+        name: 'DELETE /api/weights/:id',
+        method: 'DELETE',
+        path: '/api/weights/__WEIGHT_ID__',
+        auth: true,
+        body: null,
+        desc: 'Deletes a weight entry by document id. Run "GET /api/weights" first, then paste an id into the path.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'message: "Weight entry deleted."', fn: r => r.json?.message === 'Weight entry deleted.' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'streak',
+    label: 'Streak',
+    tests: [
+      {
+        id: 'streak_get',
+        name: 'GET /api/streak',
+        method: 'GET',
+        path: '/api/streak',
+        auth: true,
+        body: null,
+        desc: 'Returns the current streak count and the date it was last incremented.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Has count field', fn: r => r.json?.count !== undefined },
+          { label: 'count is a number', fn: r => typeof r.json?.count === 'number' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'dashboard',
+    label: 'Dashboard',
+    tests: [
+      {
+        id: 'dashboard_get',
+        name: 'GET /api/dashboard',
+        method: 'GET',
+        path: '/api/dashboard',
+        auth: true,
+        body: null,
+        desc: 'Aggregate endpoint — runs all Firestore reads in parallel and returns everything the dashboard needs in one response.',
+        assertions: [
+          { label: 'Status 200', fn: r => r.status === 200 },
+          { label: 'Has profile', fn: r => r.json?.profile !== undefined },
+          { label: 'Has prefs', fn: r => r.json?.prefs !== undefined },
+          { label: 'Has today', fn: r => r.json?.today !== undefined },
+          { label: 'today has totals', fn: r => r.json?.today?.totals !== undefined },
+          { label: 'Has weights array', fn: r => Array.isArray(r.json?.weights) },
+          { label: 'Has streak', fn: r => r.json?.streak !== undefined },
+          { label: 'Response under 1500ms', fn: r => r.time < 1500 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'notfound',
+    label: 'Edge Cases',
+    tests: [
+      {
+        id: 'not_found',
+        name: '404 on unknown route',
+        method: 'GET',
+        path: '/api/this-does-not-exist',
+        auth: false,
+        body: null,
+        desc: 'Any route not defined in server.js must return 404 with an error field.',
+        assertions: [
+          { label: 'Status 404', fn: r => r.status === 404 },
+          { label: 'Body has error field', fn: r => !!r.json?.error },
+        ],
+      },
+      {
+        id: 'log_missing_params',
+        name: 'Reject log range with no params',
+        method: 'GET',
+        path: '/api/log',
+        auth: true,
+        body: null,
+        desc: 'Calling /api/log with no from/to params must return 400.',
+        assertions: [
+          { label: 'Status 400', fn: r => r.status === 400 },
+          { label: 'Body has error', fn: r => !!r.json?.error },
+        ],
+      },
+    ],
+  },
+];
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const results = {};       // testId → { status, httpStatus, time, json, assertions }
+let activeTestId = null;
+
+// flatten
+const allTests = SUITES.flatMap(s => s.tests);
+
+// ═══════════════════════════════════════════════════════════
+//  REQUEST RUNNER
+// ═══════════════════════════════════════════════════════════
+async function runTest(testId, customBody) {
+  const test = allTests.find(t => t.id === testId);
+  if (!test) return;
+
+  const base  = document.getElementById('cfg-base').value.replace(/\/$/, '');
+  const token = document.getElementById('cfg-token').value.trim();
+
+  setResult(testId, { status: 'running', assertions: test.assertions.map(() => 'pending') });
+  renderSuiteList();
+  if (activeTestId === testId) renderDetail(testId);
+
+  const headers = { 'Content-Type': 'application/json' };
+  if (test.auth === true && token) headers['Authorization'] = `Bearer ${token}`;
+  if (test.auth === 'bad') headers['Authorization'] = `Bearer invalid.token.xyz`;
+
+  const bodyStr = customBody || (test.body ? JSON.stringify(test.body, null, 2) : null);
+  const bodyObj = bodyStr ? JSON.parse(bodyStr) : undefined;
+
+  const t0 = performance.now();
+  let res, json, errMsg;
+  try {
+    res = await fetch(`${base}${test.path}`, {
+      method: test.method,
+      headers,
+      body: bodyObj ? JSON.stringify(bodyObj) : undefined,
+    });
+    try { json = await res.clone().json(); } catch { json = null; }
+  } catch(e) {
+    errMsg = e.message;
+  }
+  const time = Math.round(performance.now() - t0);
+
+  if (errMsg) {
+    setResult(testId, { status: 'fail', httpStatus: 0, time, json: null, error: errMsg, assertions: test.assertions.map(() => 'fail') });
+  } else {
+    const r = { status: res.status, time, json };
+    const assertResults = test.assertions.map(a => {
+      try { return a.fn(r) ? 'pass' : 'fail'; } catch { return 'fail'; }
+    });
+    const overallStatus = assertResults.every(a => a === 'pass') ? 'pass' : 'fail';
+    setResult(testId, { status: overallStatus, httpStatus: res.status, time, json, error: null, assertions: assertResults });
+  }
+
+  renderSuiteList();
+  updateSummary();
+  if (activeTestId === testId) renderDetail(testId);
+}
+
+function setResult(testId, data) {
+  results[testId] = data;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RUN ALL
+// ═══════════════════════════════════════════════════════════
+async function runAll() {
+  const btn = document.getElementById('run-all-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Running…';
+  clearResults(false);
+
+  for (let i = 0; i < allTests.length; i++) {
+    const t = allTests[i];
+
+    // After weight POST, capture the id and inject into DELETE path
+    if (t.id === 'weight_post') {
+      await runTest(t.id);
+      const weightId = results['weight_post']?.json?.id;
+      if (weightId) {
+        const delTest = allTests.find(x => x.id === 'weight_delete');
+        if (delTest) delTest.path = `/api/weights/${weightId}`;
+      }
+    }
+    // After meal POST, capture id and inject into DELETE path
+    else if (t.id === 'log_add_meal') {
+      await runTest(t.id);
+      const mealId = results['log_add_meal']?.json?.meal?.id;
+      if (mealId) {
+        const delTest = allTests.find(x => x.id === 'log_delete_meal');
+        if (delTest) delTest.path = `/api/log/today/meals/${mealId}`;
+      }
+    }
+    else {
+      await runTest(t.id);
+    }
+
+    document.getElementById('progress-fill').style.width = ((i+1)/allTests.length*100)+'%';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '▶ Run All Tests';
+  setTimeout(() => {
+    document.getElementById('progress-fill').style.width = '0%';
+  }, 2000);
+}
+
+function clearResults(render = true) {
+  Object.keys(results).forEach(k => delete results[k]);
+  if (render) {
+    renderSuiteList();
+    updateSummary();
+    if (activeTestId) renderDetail(activeTestId);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SUMMARY
+// ═══════════════════════════════════════════════════════════
+function updateSummary() {
+  const all = allTests.length;
+  const pass = allTests.filter(t => results[t.id]?.status === 'pass').length;
+  const fail = allTests.filter(t => results[t.id]?.status === 'fail').length;
+  const skip = all - pass - fail;
+  document.getElementById('s-total').textContent = all;
+  document.getElementById('s-pass').textContent  = pass;
+  document.getElementById('s-fail').textContent  = fail;
+  document.getElementById('s-skip').textContent  = skip;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER SUITE LIST
+// ═══════════════════════════════════════════════════════════
+function renderSuiteList() {
+  const el = document.getElementById('suite-list');
+  el.innerHTML = SUITES.map(suite => {
+    const suitePass = suite.tests.filter(t => results[t.id]?.status === 'pass').length;
+    const suiteFail = suite.tests.filter(t => results[t.id]?.status === 'fail').length;
+    const items = suite.tests.map(t => {
+      const r = results[t.id];
+      const dotClass = r?.status || 'skip';
+      const active = t.id === activeTestId ? ' active' : '';
+      const running = r?.status === 'running' ? ' running' : '';
+      return `<div class="suite-item${active}${running}" onclick="selectTest('${t.id}')">
+        <span class="test-dot ${dotClass}"></span>
+        <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</span>
+      </div>`;
+    }).join('');
+    const badges = (suitePass || suiteFail)
+      ? `<span class="suite-badges">
+          ${suitePass ? `<span style="font-size:10px;color:var(--green);font-weight:700">${suitePass}✓</span>` : ''}
+          ${suiteFail ? `<span style="font-size:10px;color:var(--red);font-weight:700">${suiteFail}✗</span>` : ''}
+        </span>` : '';
+    return `<div>
+      <div class="suite-header">${suite.label}${badges}</div>
+      ${items}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SELECT + RENDER DETAIL
+// ═══════════════════════════════════════════════════════════
+function selectTest(testId) {
+  activeTestId = testId;
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('test-detail').style.display = 'block';
+  renderSuiteList();
+  renderDetail(testId);
+}
+
+function renderDetail(testId) {
+  const test = allTests.find(t => t.id === testId);
+  if (!test) return;
+  const r = results[testId];
+  const el = document.getElementById('test-detail');
+
+  const methodClass = `method-${test.method.toLowerCase()}`;
+  const bodyDefault = test.body ? JSON.stringify(test.body, null, 2) : '';
+
+  // Status badge
+  let badge = '';
+  if (!r) badge = `<span class="status-badge status-pending">● Pending</span>`;
+  else if (r.status === 'running') badge = `<span class="status-badge status-running">⏳ Running…</span>`;
+  else if (r.status === 'pass')    badge = `<span class="status-badge status-pass">✓ Passed</span>`;
+  else if (r.status === 'fail')    badge = `<span class="status-badge status-fail">✗ Failed</span>`;
+
+  // Assertions
+  let assertHtml = '';
+  test.assertions.forEach((a, i) => {
+    const aStatus = r?.assertions?.[i] || 'pending';
+    assertHtml += `<div class="assertion ${aStatus}">
+      <span class="assertion-icon"></span>
+      <span class="assertion-text">${a.label}</span>
+    </div>`;
+  });
+
+  // Response section
+  let resHtml = '';
+  if (r && r.status !== 'running') {
+    if (r.error) {
+      resHtml = `<div class="section">
+        <div class="section-head">⚠️ Network Error</div>
+        <div class="section-body">
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--red);line-height:1.6;">${r.error}</div>
+          <div style="font-size:12px;color:var(--slate);margin-top:10px;">Is the server running at <code style="font-family:var(--font-mono)">${document.getElementById('cfg-base').value}</code>?</div>
+        </div>
+      </div>`;
+    } else {
+      const codeClass = r.httpStatus >= 200 && r.httpStatus < 300 ? 'ok' : r.httpStatus >= 400 ? 'err' : 'warn';
+      const pretty = r.json ? JSON.stringify(r.json, null, 2) : '(empty body)';
+      const size = new Blob([pretty]).size;
+      const sizeStr = size > 1024 ? (size/1024).toFixed(1)+' KB' : size+' B';
+
+      // Timing bar
+      const timeMax = Math.max(r.time, 100);
+      const timePct = Math.min(100, (r.time / 2000) * 100);
+      const timeColor = r.time < 300 ? 'var(--green)' : r.time < 1000 ? 'var(--amber)' : 'var(--red)';
+
+      resHtml = `<div class="section">
+        <div class="section-head">
+          📥 Response
+          <button class="copy-btn" onclick="copyText(${JSON.stringify(pretty)})">Copy JSON</button>
+        </div>
+        <div class="section-body">
+          <div class="res-meta">
+            <span class="res-code ${codeClass}">${r.httpStatus}</span>
+            ${badge}
+            <span class="res-time">⏱ ${r.time}ms</span>
+            <span class="res-size">${sizeStr}</span>
+          </div>
+          <div class="timing-row">
+            <div class="timing-label">Response time</div>
+            <div class="timing-bar-bg"><div class="timing-bar-fill" style="width:${timePct}%;background:${timeColor}"></div></div>
+            <div class="timing-val">${r.time}ms</div>
+          </div>
+          <div class="code-block" style="margin-top:14px">${escHtml(pretty)}</div>
+        </div>
+      </div>`;
+    }
+  }
+
+  el.innerHTML = `
+    <div class="test-header">
+      <span class="test-method ${methodClass}">${test.method}</span>
+      <div class="test-meta">
+        <div class="test-name">${test.name}</div>
+        <div class="test-path">${document.getElementById('cfg-base').value}${test.path}</div>
+        <div class="test-desc">${test.desc}</div>
+      </div>
+      <button class="run-btn" onclick="runTestFromDetail('${testId}')" id="run-btn-${testId}">▶ Run</button>
+    </div>
+
+    ${!r ? `<div style="margin-bottom:16px">${badge}</div>` : ''}
+
+    ${test.body !== null ? `
+    <div class="section">
+      <div class="section-head">📤 Request Body</div>
+      <div class="section-body">
+        <textarea class="body-editor" id="body-${testId}" rows="${bodyDefault.split('\n').length + 1}">${bodyDefault}</textarea>
+      </div>
+    </div>` : ''}
+
+    <div class="section">
+      <div class="section-head">✅ Assertions</div>
+      <div class="section-body">
+        <div class="assertion-list">${assertHtml}</div>
+      </div>
+    </div>
+
+    ${resHtml}
+  `;
+}
+
+function runTestFromDetail(testId) {
+  const bodyEl = document.getElementById(`body-${testId}`);
+  const body = bodyEl ? bodyEl.value : null;
+  runTest(testId, body);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function toggleToken() {
+  const el = document.getElementById('cfg-token');
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+renderSuiteList();
+updateSummary();
+</script>
+</body>
+</html>
