@@ -1,1 +1,1 @@
-export const BASE = "https://nutritrack-api-2d19.onrender.com";
+window.BASE = "https://nutritrack-api-2d19.onrender.com";
