@@ -324,7 +324,6 @@ function calculate() {
   document.getElementById('result-content').classList.add('show');
   document.getElementById('custom-panel').style.display = 'block';
 
-  // Set sliders
   document.getElementById('prot-slider').value = Math.round(protPct*100);
   document.getElementById('carb-slider').value = Math.round(carbPct*100);
   document.getElementById('fat-slider').value = Math.round(fatPct*100);
@@ -344,7 +343,6 @@ function renderMacros(cal, protPct, carbPct, fatPct) {
   document.getElementById('r-fat-pct').textContent = Math.round(fatPct*100)+'%';
   document.getElementById('d-center').textContent = cal;
 
-  // Donut (circumference 440)
   const C = 440;
   const protLen = C * protPct;
   const carbLen = C * carbPct;
