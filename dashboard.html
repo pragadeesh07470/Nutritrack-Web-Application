@@ -439,10 +439,10 @@
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script type="module">
   import { requireAuth, logoutUser } from "./auth.js";
-
-  const BASE = "http://localhost:3001";
+  import { apiFetch } from "./js/api.js";
 
   window.logout = logoutUser;
 
@@ -452,9 +452,9 @@
 
   async function loadDashboard(token) {
     try {
-      const res  = await fetch(`${BASE}/api/dashboard`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const token = localStorage.getItem("nt_token");
+
+     const res = await apiFetch(`${BASE}/api/dashboard`);
       const data = await res.json();
 
       const { profile, prefs, today, weights, streak } = data;
