@@ -1,272 +1,365 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+# 📄 README — Setup Guide v1.0
 
+# Get NutriTrack running in 60 seconds
 
-  <!-- HERO -->
-  <div class="readme-hero">
-    <div class="hero-badge">📄 README — Setup Guide v1.0</div>
-    <h1 class="hero-title">Get <span>NutriTrack</span><br>running in 60 seconds</h1>
-    <p class="hero-sub">A fully client-side nutrition & body tracking app — no server, no database, no install. Just drop 7 HTML files in one folder and open your browser.</p>
-    <div class="hero-pills">
-      <span class="pill pill-green">✓ No server needed</span>
-      <span class="pill pill-blue">✓ Works offline</span>
-      <span class="pill pill-amber">✓ Data stays on your device</span>
-      <span class="pill pill-purple">✓ 6 fully connected pages</span>
-    </div>
-  </div>
+A fully client-side nutrition & body tracking app — no server, no database, no install. Just drop 7 HTML files in one folder and open your browser.
 
-  <!-- FILE STRUCTURE -->
-  <div class="section" id="setup">
-    <div class="section-title">📁 File Structure</div>
-    <div class="section-sub">All files must live in the <strong>same folder</strong>. The names below must match exactly — they are hardcoded in the navigation links.</div>
-    <div class="file-tree">
-      <div class="ft-folder">📁 nutritrack/  <span class="ft-comment">&lt;-- your folder name (anything works)</span></div>
-      <div class="ft-indent">
-        <div class="ft-file">├── <a href="login.html">login.html</a>  <span class="ft-comment">← Start here</span></div>
-        <div class="ft-file">├── <a href="dashboard.html">dashboard.html</a>  <span class="ft-comment">← Main hero / home</span></div>
-        <div class="ft-file">├── <a href="food-log.html">food-log.html</a>  <span class="ft-comment">← Log meals & nutrients</span></div>
-        <div class="ft-file">├── <a href="bmi-calculator.html">bmi-calculator.html</a>  <span class="ft-comment">← BMI calculator</span></div>
-        <div class="ft-file">├── <a href="macro-calculator.html">macro-calculator.html</a>  <span class="ft-comment">← TDEE & macros</span></div>
-        <div class="ft-file">├── <a href="download-report.html">download-report.html</a>  <span class="ft-comment">← Export data</span></div>
-        <div class="ft-file">└── <a href="README.html" style="color:var(--amber)">README.html</a>  <span class="ft-comment">← This file</span></div>
-      </div>
-    </div>
-    <div class="alert alert-amber" style="margin-top:16px">
-      <span class="alert-icon">⚠️</span>
-      <div class="alert-body"><strong>File names are case-sensitive.</strong> Do not rename the files — all sidebar navigation links reference these exact filenames. If you rename one, update every <code>&lt;a href="..."&gt;</code> that points to it.</div>
-    </div>
-  </div>
+✅ No server needed
+✅ Works offline
+✅ Data stays on your device
+✅ 6 fully connected pages
 
-  <!-- HOW TO RUN -->
-  <div class="section">
-    <div class="section-title">🚀 How to Run</div>
-    <div class="section-sub">Three ways to open the app — pick whatever's easiest for you.</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-body">
-          <div class="step-title">Double-click method (simplest)</div>
-          <div class="step-desc">Download all 7 files into one folder. Double-click <code>login.html</code>. It opens in your default browser. Done. All pages and navigation will work immediately.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-body">
-          <div class="step-title">VS Code Live Server (recommended for development)</div>
-          <div class="step-desc">Install the <strong>Live Server</strong> extension in VS Code. Right-click <code>login.html</code> → <em>Open with Live Server</em>. Auto-reloads on save. Great for customizing the app.</div>
-          <div class="code-block">
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            <span class="comment"># Install VS Code extension:</span><br>
-            <span class="keyword">ext install</span> <span class="string">ritwickdey.LiveServer</span><br><br>
-            <span class="comment"># Or install via command line:</span><br>
-            <span class="keyword">code</span> --install-extension ritwickdey.LiveServer
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-body">
-          <div class="step-title">Python / Node local server</div>
-          <div class="step-desc">Open your terminal, <code>cd</code> into the folder, and run one of these:</div>
-          <div class="code-block">
-            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-            <span class="comment"># Python 3 (built-in — no install needed)</span><br>
-            <span class="fn">python3</span> -m http.server <span class="string">8080</span><br><br>
-            <span class="comment"># Node.js (if you have Node installed)</span><br>
-            <span class="fn">npx</span> serve .<br><br>
-            <span class="comment"># Then open in browser:</span><br>
-            <span class="string">http://localhost:8080/login.html</span>
-          </div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-body">
-          <div class="step-title">Deploy to the web (optional)</div>
-          <div class="step-desc">Drop the folder into <strong>GitHub Pages</strong>, <strong>Netlify</strong>, or <strong>Vercel</strong> for free hosting. No build step needed — just upload the HTML files as-is. Data stays in each user's browser localStorage (not shared).</div>
-        </div>
-      </div>
-    </div>
-  </div>
+---
 
-  <!-- PAGES -->
-  <div class="section" id="pages">
-    <div class="section-title">📄 Pages Overview</div>
-    <div class="section-sub">Every page shares the same sidebar navigation and color system.</div>
-    <div class="page-grid">
-      <a href="login.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">🔐</span><span class="pc-name">Login & Register</span></div>
-        <div class="pc-file">login.html</div>
-        <div class="pc-desc">Sign in / create account. Stores credentials in localStorage. "Remember me" auto-fills email. Social login buttons simulate auth.</div>
-      </a>
-      <a href="dashboard.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">🏠</span><span class="pc-name">Dashboard</span></div>
-        <div class="pc-file">dashboard.html</div>
-        <div class="pc-desc">Hero page. Shows today's calorie ring, macro bars, recent meals, weight history chart, quick nav cards, and day streak.</div>
-      </a>
-      <a href="food-log.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">🥗</span><span class="pc-name">Food Log</span></div>
-        <div class="pc-file">food-log.html</div>
-        <div class="pc-desc">Log meals by meal type. Search 18 built-in foods (auto-fills macros). Manual entry for all macros + 6 micronutrients. Edit/delete entries. Water tracker. Date navigation.</div>
-      </a>
-      <a href="bmi-calculator.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">⚖️</span><span class="pc-name">BMI Calculator</span></div>
-        <div class="pc-file">bmi-calculator.html</div>
-        <div class="pc-desc">Metric & imperial units. Animated gauge needle. Healthy weight range, ideal weight (Devine formula), body fat estimate. Saves history.</div>
-      </a>
-      <a href="macro-calculator.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">📊</span><span class="pc-name">Macro Calculator</span></div>
-        <div class="pc-file">macro-calculator.html</div>
-        <div class="pc-desc">Mifflin-St Jeor TDEE formula. 3 goals × 5 activity levels. Animated donut chart. Custom macro split sliders. Per-meal breakdown. Save as goals.</div>
-      </a>
-      <a href="download-report.html" class="page-card">
-        <div class="pc-top"><span class="pc-icon">📥</span><span class="pc-name">Download Report</span></div>
-        <div class="pc-file">download-report.html</div>
-        <div class="pc-desc">Export as CSV (Excel-ready), JSON (raw data), or Printable HTML report. Date range picker. Live data preview table. Calorie trend chart.</div>
-      </a>
-    </div>
-  </div>
+# 📁 File Structure
 
-  <!-- DATA STORAGE -->
-  <div class="section" id="data">
-    <div class="section-title">💾 Data Storage</div>
-    <div class="section-sub">Everything is saved in your browser's <code>localStorage</code> — no server, no account required on the backend.</div>
-    <div class="flow-grid">
-      <div class="flow-card">
-        <div class="flow-key">nt_session</div>
-        <div class="flow-desc">Active login session: name, email. Cleared on logout.</div>
-      </div>
-      <div class="flow-card">
-        <div class="flow-key">nt_users</div>
-        <div class="flow-desc">Registered accounts object. Key = email, value = hashed profile.</div>
-      </div>
-      <div class="flow-card">
-        <div class="flow-key">nt_food_log</div>
-        <div class="flow-desc">Daily food entries keyed by date (YYYY-MM-DD). Contains meals array + water intake.</div>
-      </div>
-      <div class="flow-card">
-        <div class="flow-key">nt_weights</div>
-        <div class="flow-desc">Array of weight log entries: <code>{date, weight}</code>. Used on dashboard and download page.</div>
-      </div>
-      <div class="flow-card">
-        <div class="flow-key">nt_bmi_history</div>
-        <div class="flow-desc">Array of BMI records: <code>{date, bmi, weight, cat}</code>. Saved each time you calculate.</div>
-      </div>
-      <div class="flow-card">
-        <div class="flow-key">nt_goals</div>
-        <div class="flow-desc">Daily targets: calories, protein, carbs, fat. Set from Macro Calculator → Save Goals.</div>
-      </div>
-    </div>
-    <div class="alert alert-teal" style="margin-top:16px">
-      <span class="alert-icon">💡</span>
-      <div class="alert-body"><strong>Data persists until cleared.</strong> localStorage survives browser restarts. Use <em>Download Report → Clear All Data</em> to reset, or open DevTools → Application → Local Storage to inspect manually.</div>
-    </div>
-  </div>
+All files must live in the **same folder**. The names below must match exactly — they are hardcoded in the navigation links.
 
-  <!-- FEATURES TABLE -->
-  <div class="section" id="features">
-    <div class="section-title">✅ Features Checklist</div>
-    <div class="section-sub">Everything included out of the box.</div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden">
-      <table class="feature-table">
-        <thead><tr><th>Feature</th><th>Page</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td>User registration & login (localStorage auth)</td><td>login.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Session persistence & "remember me"</td><td>login.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Daily calorie ring (animated)</td><td>dashboard.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Macro progress bars</td><td>dashboard.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Weight history chart</td><td>dashboard.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Day streak tracker</td><td>dashboard.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>18-food searchable database</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Auto-scale macros by serving size</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>4 meal types (breakfast/lunch/dinner/snack)</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>12-field nutrition entry (macros + 6 micros)</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Edit & delete food entries</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Water intake tracker</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Date navigation (log past days)</td><td>food-log.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>BMI calculator (metric + imperial)</td><td>bmi-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Animated BMI gauge</td><td>bmi-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Body fat % estimate</td><td>bmi-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>BMI history tracking</td><td>bmi-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>TDEE calculator (Mifflin-St Jeor)</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>5 activity levels</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Animated donut macro chart</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Custom macro split sliders</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Per-meal breakdown</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Save goals (used by food log + dashboard)</td><td>macro-calculator.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>CSV export (Excel-ready)</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>JSON export (raw data)</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Printable HTML report (save as PDF)</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Date range filter (7 / 30 / 60 / 90 / custom)</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Calorie trend bar chart</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Clear all data (danger zone)</td><td>download-report.html</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Responsive layout (mobile-friendly)</td><td>All pages</td><td><span class="badge badge-green">✓ Done</span></td></tr>
-          <tr><td>Google Fonts (Sora + Inter)</td><td>All pages</td><td><span class="badge badge-blue">Requires internet</span></td></tr>
-          <tr><td>Expand food database</td><td>food-log.html</td><td><span class="badge badge-amber">Customizable</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+```text
+📁 nutritrack/  <-- your folder name (anything works)
+├── login.html                ← Start here
+├── dashboard.html            ← Main hero / home
+├── food-log.html             ← Log meals & nutrients
+├── bmi-calculator.html       ← BMI calculator
+├── macro-calculator.html     ← TDEE & macros
+├── download-report.html      ← Export data
+└── README.md                 ← This file
+```
 
-  <!-- CUSTOMIZATION -->
-  <div class="section">
-    <div class="section-title">🎨 Customization Tips</div>
-    <div class="section-sub">Quick ways to make NutriTrack your own.</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">→</div>
-        <div class="step-body">
-          <div class="step-title">Change the color theme</div>
-          <div class="step-desc">Every page uses CSS custom properties at the top. Change <code>--teal</code>, <code>--amber</code>, <code>--purple</code> in the <code>:root</code> block of any file to instantly retheme the whole app.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">→</div>
-        <div class="step-body">
-          <div class="step-title">Add more foods to the database</div>
-          <div class="step-desc">In <code>food-log.html</code>, find the <code>const FOOD_DB = [...]</code> array. Each entry follows the pattern <code>{name, per100: {calories, protein, carbs, fat, fiber, sugar, sodium, vitc, calcium, iron}}</code>.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">→</div>
-        <div class="step-body">
-          <div class="step-title">Change default calorie goal</div>
-          <div class="step-desc">The default goal is <code>2000 kcal</code>. To change it permanently, find <code>localStorage.getItem('nt_goals') || '{"calories":2000,...}'</code> in each file and update the defaults, or just use the Macro Calculator to set goals from the UI.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">→</div>
-        <div class="step-body">
-          <div class="step-title">Offline fonts (no internet dependency)</div>
-          <div class="step-desc">Replace the Google Fonts <code>&lt;link&gt;</code> tags with locally downloaded fonts. Download <strong>Sora</strong> and <strong>Inter</strong> from Google Fonts, add them to your folder, and use <code>@font-face</code> in a <code>shared.css</code> file.</div>
-        </div>
-      </div>
-    </div>
-  </div>
+> ⚠️ **File names are case-sensitive.**
+> Do not rename the files — all sidebar navigation links reference these exact filenames.
+> If you rename one, update every `<a href="...">` that points to it.
 
-  <!-- LAUNCH -->
-  <div class="launch-wrap">
-    <a href="login.html" class="launch-btn">
-      🚀 Launch NutriTrack
-    </a>
-    <p class="launch-sub">Opens <code>login.html</code> — your starting point</p>
-  </div>
+---
 
-</div>
+# 🚀 How to Run
 
-<script>
-function copyCode(btn) {
-  const block = btn.parentElement;
-  const text = block.innerText.replace('Copy\n','').trim();
-  navigator.clipboard.writeText(text).then(()=>{
-    btn.textContent = 'Copied!';
-    btn.style.color = 'var(--teal)';
-    setTimeout(()=>{ btn.textContent = 'Copy'; btn.style.color = ''; }, 2000);
-  }).catch(()=>{ btn.textContent = 'Failed'; });
+Three ways to open the app — pick whatever's easiest for you.
+
+---
+
+## 1️⃣ Double-click method (simplest)
+
+Download all 7 files into one folder.
+
+Double-click:
+
+```text
+login.html
+```
+
+It opens in your default browser. Done.
+All pages and navigation will work immediately.
+
+---
+
+## 2️⃣ VS Code Live Server (recommended for development)
+
+Install the **Live Server** extension in VS Code.
+
+Right-click `login.html` → **Open with Live Server**
+
+Auto-reloads on save. Great for customizing the app.
+
+### Install extension
+
+```bash
+ext install ritwickdey.LiveServer
+```
+
+### Or install via command line
+
+```bash
+code --install-extension ritwickdey.LiveServer
+```
+
+---
+
+## 3️⃣ Python / Node local server
+
+Open your terminal, `cd` into the folder, and run one of these:
+
+### Python 3 (built-in — no install needed)
+
+```bash
+python3 -m http.server 8080
+```
+
+### Node.js (if you have Node installed)
+
+```bash
+npx serve .
+```
+
+Then open:
+
+```text
+http://localhost:8080/login.html
+```
+
+---
+
+## 4️⃣ Deploy to the web (optional)
+
+Drop the folder into:
+
+* GitHub Pages
+* Netlify
+* Vercel
+
+for free hosting.
+
+No build step needed — just upload the HTML files as-is.
+
+Data stays in each user's browser `localStorage` (not shared).
+
+---
+
+# 📄 Pages Overview
+
+Every page shares the same sidebar navigation and color system.
+
+---
+
+## 🔐 Login & Register
+
+**File:** `login.html`
+
+* Sign in / create account
+* Stores credentials in localStorage
+* "Remember me" auto-fills email
+* Social login buttons simulate auth
+
+---
+
+## 🏠 Dashboard
+
+**File:** `dashboard.html`
+
+* Today's calorie ring
+* Macro progress bars
+* Recent meals
+* Weight history chart
+* Quick navigation cards
+* Day streak tracker
+
+---
+
+## 🥗 Food Log
+
+**File:** `food-log.html`
+
+* Log meals by meal type
+* Search 18 built-in foods
+* Auto-fills macros
+* Manual nutrition entry
+* Edit/delete entries
+* Water tracker
+* Date navigation
+
+---
+
+## ⚖️ BMI Calculator
+
+**File:** `bmi-calculator.html`
+
+* Metric & imperial units
+* Animated gauge needle
+* Healthy weight range
+* Ideal weight (Devine formula)
+* Body fat estimate
+* Saves BMI history
+
+---
+
+## 📊 Macro Calculator
+
+**File:** `macro-calculator.html`
+
+* Mifflin-St Jeor TDEE formula
+* 3 goals × 5 activity levels
+* Animated donut chart
+* Custom macro sliders
+* Per-meal breakdown
+* Save goals feature
+
+---
+
+## 📥 Download Report
+
+**File:** `download-report.html`
+
+* CSV export (Excel-ready)
+* JSON export
+* Printable HTML report
+* Date range picker
+* Live preview table
+* Calorie trend chart
+
+---
+
+# 💾 Data Storage
+
+Everything is saved in your browser's `localStorage`.
+
+No server. No backend account system.
+
+| Key              | Purpose               |
+| ---------------- | --------------------- |
+| `nt_session`     | Active login session  |
+| `nt_users`       | Registered accounts   |
+| `nt_food_log`    | Daily food entries    |
+| `nt_weights`     | Weight history        |
+| `nt_bmi_history` | BMI records           |
+| `nt_goals`       | Daily nutrition goals |
+
+---
+
+## 💡 Data Persistence
+
+`localStorage` survives browser restarts.
+
+To reset data:
+
+* Use **Download Report → Clear All Data**
+* OR open DevTools → Application → Local Storage
+
+---
+
+# ✅ Features Checklist
+
+Everything included out of the box.
+
+| Feature                     | Page                    | Status               |
+| --------------------------- | ----------------------- | -------------------- |
+| User registration & login   | `login.html`            | ✅ Done               |
+| Session persistence         | `login.html`            | ✅ Done               |
+| Daily calorie ring          | `dashboard.html`        | ✅ Done               |
+| Macro progress bars         | `dashboard.html`        | ✅ Done               |
+| Weight history chart        | `dashboard.html`        | ✅ Done               |
+| Day streak tracker          | `dashboard.html`        | ✅ Done               |
+| 18-food searchable database | `food-log.html`         | ✅ Done               |
+| Auto-scale macros           | `food-log.html`         | ✅ Done               |
+| 4 meal types                | `food-log.html`         | ✅ Done               |
+| 12-field nutrition entry    | `food-log.html`         | ✅ Done               |
+| Edit/delete entries         | `food-log.html`         | ✅ Done               |
+| Water intake tracker        | `food-log.html`         | ✅ Done               |
+| Date navigation             | `food-log.html`         | ✅ Done               |
+| BMI calculator              | `bmi-calculator.html`   | ✅ Done               |
+| Animated BMI gauge          | `bmi-calculator.html`   | ✅ Done               |
+| Body fat estimate           | `bmi-calculator.html`   | ✅ Done               |
+| BMI history tracking        | `bmi-calculator.html`   | ✅ Done               |
+| TDEE calculator             | `macro-calculator.html` | ✅ Done               |
+| 5 activity levels           | `macro-calculator.html` | ✅ Done               |
+| Animated donut chart        | `macro-calculator.html` | ✅ Done               |
+| Custom macro sliders        | `macro-calculator.html` | ✅ Done               |
+| Per-meal breakdown          | `macro-calculator.html` | ✅ Done               |
+| Save goals                  | `macro-calculator.html` | ✅ Done               |
+| CSV export                  | `download-report.html`  | ✅ Done               |
+| JSON export                 | `download-report.html`  | ✅ Done               |
+| Printable HTML report       | `download-report.html`  | ✅ Done               |
+| Date range filter           | `download-report.html`  | ✅ Done               |
+| Calorie trend chart         | `download-report.html`  | ✅ Done               |
+| Clear all data              | `download-report.html`  | ✅ Done               |
+| Responsive layout           | All pages               | ✅ Done               |
+| Google Fonts (Sora + Inter) | All pages               | 🌐 Requires internet |
+| Expand food database        | `food-log.html`         | ⚙️ Customizable      |
+
+---
+
+# 🎨 Customization Tips
+
+Quick ways to make NutriTrack your own.
+
+---
+
+## → Change the color theme
+
+Every page uses CSS custom properties.
+
+Edit:
+
+```css
+:root{
+  --teal:#14b8a6;
+  --amber:#f59e0b;
+  --purple:#8b5cf6;
 }
-</script>
-</body>
-</html>
+```
+
+to instantly retheme the app.
+
+---
+
+## → Add more foods to the database
+
+Inside `food-log.html`, find:
+
+```js
+const FOOD_DB = [...]
+```
+
+Each entry follows:
+
+```js
+{
+  name,
+  per100:{
+    calories,
+    protein,
+    carbs,
+    fat,
+    fiber,
+    sugar,
+    sodium,
+    vitc,
+    calcium,
+    iron
+  }
+}
+```
+
+---
+
+## → Change default calorie goal
+
+Default goal:
+
+```text
+2000 kcal
+```
+
+Find:
+
+```js
+localStorage.getItem('nt_goals') || '{"calories":2000,...}'
+```
+
+and update the defaults.
+
+You can also set goals directly from the Macro Calculator UI.
+
+---
+
+## → Offline fonts (no internet dependency)
+
+Replace Google Fonts `<link>` tags with locally downloaded fonts.
+
+Recommended fonts:
+
+* Sora
+* Inter
+
+Use `@font-face` in a shared CSS file.
+
+---
+
+# 🚀 Launch NutriTrack
+
+Open:
+
+```text
+login.html
+```
+
+Your starting point for the application.
