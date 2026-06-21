@@ -1,44 +1,14 @@
-// ============================================================
-//  NutriTrack — Firebase Admin SDK  (backend/firebaseAdmin.js)
-//  Required by server.js for verifying Firebase ID tokens.
-//  Data lives in Postgres (see db.js / pool.js) — Firebase is
-//  used for authentication only, not storage.
-//  Uses a service-account key for privileged server access.
-// ============================================================
-
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { getAuth }                      from "firebase-admin/auth";
+import { getAuth } from "firebase-admin/auth";
 
-// ─── 🔧 SETUP STEPS ─────────────────────────────────────────
-//  1. Firebase Console → Project Settings → Service Accounts
-//  2. Click "Generate new private key" → save as
-//     backend/serviceAccountKey.json   (NEVER commit this file!)
-//  3. Add  backend/serviceAccountKey.json  to .gitignore
-//
-//  Alternatively, set the env var and remove the cert() call:
-//    GOOGLE_APPLICATION_CREDENTIALS=./backend/serviceAccountKey.json
-// ────────────────────────────────────────────────────────────
-
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-
-let serviceAccount;
-try {
-  serviceAccount = require("./serviceAccountKey.json");
-} catch {
-  console.warn(
-    "⚠️  serviceAccountKey.json not found — " +
-    "falling back to GOOGLE_APPLICATION_CREDENTIALS env var."
-  );
-}
-
-// Guard against re-initialising during hot-reload
 if (!getApps().length) {
-  initializeApp(
-    serviceAccount
-      ? { credential: cert(serviceAccount) }
-      : undefined   // uses GOOGLE_APPLICATION_CREDENTIALS
-  );
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    }),
+  });
 }
 
 export const auth = getAuth();
