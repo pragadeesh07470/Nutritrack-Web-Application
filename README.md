@@ -17,13 +17,27 @@ All files must live in the **same folder**. The names below must match exactly �
 
 ```text
 📁 nutritrack/  <-- your folder name (anything works)
-├── login.html                ← Start here
-├── dashboard.html            ← Main hero / home
-├── food-log.html             ← Log meals & nutrients
-├── bmi-calculator.html       ← BMI calculator
-├── macro-calculator.html     ← TDEE & macros
-├── download-report.html      ← Export data
-└── README.md                 ← This file
+Nutritrack/
+├── backend/
+│   ├── node_modules/
+│   ├── server.js
+│   ├── db.js
+│   ├── firebaseAdmin.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── serviceAccountKey.json
+├── firebase-config.js
+├── login.html
+├── dashboard.html
+├── food-log.html
+├── profile.html
+├── settings.html
+├── auth.js
+├── download-report.html
+├── bmi-calculator.html
+├── macro-calculator.html
+├── README.html
+└── .gitignore
 ```
 
 > ⚠️ **File names are case-sensitive.**
