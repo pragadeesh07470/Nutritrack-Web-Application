@@ -10,6 +10,7 @@
 //    Authorization: Bearer <Firebase ID token>
 // ============================================================
 
+import "dotenv/config";
 import express        from "express";
 import cors           from "cors";
 import helmet         from "helmet";

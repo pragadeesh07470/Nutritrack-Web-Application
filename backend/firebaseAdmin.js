@@ -1,11 +1,12 @@
 // ============================================================
 //  NutriTrack — Firebase Admin SDK  (backend/firebaseAdmin.js)
-//  Required by both db.js and server.js.
+//  Required by server.js for verifying Firebase ID tokens.
+//  Data lives in Postgres (see db.js / pool.js) — Firebase is
+//  used for authentication only, not storage.
 //  Uses a service-account key for privileged server access.
 // ============================================================
 
 import { initializeApp, cert, getApps } from "firebase-admin/app";
-import { getFirestore }                 from "firebase-admin/firestore";
 import { getAuth }                      from "firebase-admin/auth";
 
 // ─── 🔧 SETUP STEPS ─────────────────────────────────────────
@@ -40,8 +41,4 @@ if (!getApps().length) {
   );
 }
 
-export const db   = getFirestore();
 export const auth = getAuth();
-
-// Enable offline-friendly timestamps
-db.settings({ ignoreUndefinedProperties: true });
